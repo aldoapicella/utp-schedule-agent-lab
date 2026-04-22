@@ -1,0 +1,147 @@
+[
+  {
+    "group_code": "1IL131",
+    "subject_id": "5003",
+    "subject_name": "BASE DE DATOS II",
+    "province": "PANAMÁ",
+    "hour_code": "NOCHE-01",
+    "sessions": [
+      {
+        "day": "MONDAY",
+        "session_type": "Theory",
+        "classroom": "AULA 3",
+        "start_time": "17:00",
+        "end_time": "18:30"
+      },
+      {
+        "day": "WEDNESDAY",
+        "session_type": "Laboratory",
+        "lab_code": "A",
+        "classroom": "LAB 2",
+        "start_time": "18:40",
+        "end_time": "20:10"
+      }
+    ]
+  },
+  {
+    "group_code": "1IL132",
+    "subject_id": "5003",
+    "subject_name": "BASE DE DATOS II",
+    "province": "CHIRIQUÍ",
+    "hour_code": "VIRTUAL-02",
+    "sessions": [
+      {
+        "day": "TUESDAY",
+        "session_type": "Theory",
+        "classroom": "VVIRT",
+        "start_time": "18:00",
+        "end_time": "19:30"
+      },
+      {
+        "day": "THURSDAY",
+        "session_type": "Laboratory",
+        "lab_code": "A",
+        "classroom": "VVIRT",
+        "start_time": "19:40",
+        "end_time": "21:10"
+      }
+    ]
+  },
+  {
+    "group_code": "1CS101",
+    "subject_id": "0692",
+    "subject_name": "CALIDAD DE SOFTWARE",
+    "province": "PANAMÁ",
+    "hour_code": "NOCHE-03",
+    "sessions": [
+      {
+        "day": "TUESDAY",
+        "session_type": "Theory",
+        "classroom": "AULA 5",
+        "start_time": "17:00",
+        "end_time": "18:30"
+      }
+    ]
+  },
+  {
+    "group_code": "1CS102",
+    "subject_id": "0692",
+    "subject_name": "CALIDAD DE SOFTWARE",
+    "province": "PANAMÁ",
+    "hour_code": "DIA-01",
+    "sessions": [
+      {
+        "day": "FRIDAY",
+        "session_type": "Theory",
+        "classroom": "AULA 5",
+        "start_time": "14:00",
+        "end_time": "15:30"
+      }
+    ]
+  },
+  {
+    "group_code": "1AC201",
+    "subject_id": "0687",
+    "subject_name": "ORG. Y ARQ. DE COMPUTADORA",
+    "province": "PANAMÁ",
+    "hour_code": "NOCHE-02",
+    "sessions": [
+      {
+        "day": "THURSDAY",
+        "session_type": "Theory",
+        "classroom": "AULA 7",
+        "start_time": "17:00",
+        "end_time": "18:30"
+      }
+    ]
+  },
+  {
+    "group_code": "1AS301",
+    "subject_id": "0760",
+    "subject_name": "ARQUITECTURA DE SOFTWARE",
+    "province": "PANAMÁ",
+    "hour_code": "NOCHE-04",
+    "sessions": [
+      {
+        "day": "MONDAY",
+        "session_type": "Theory",
+        "classroom": "AULA 8",
+        "start_time": "18:40",
+        "end_time": "20:10"
+      }
+    ]
+  },
+  {
+    "group_code": "1R101",
+    "subject_id": "0755",
+    "subject_name": "REDES I",
+    "province": "PANAMÁ OESTE",
+    "hour_code": "REG-01",
+    "sessions": [
+      {
+        "day": "WEDNESDAY",
+        "session_type": "Theory",
+        "classroom": "AULA 4",
+        "start_time": "17:00",
+        "end_time": "18:30"
+      }
+    ]
+  },
+  {
+    "group_code": "1TE401",
+    "subject_id": "0801",
+    "subject_name": "TOPICOS ESPECIALES DE SOFTWARE",
+    "province": "PANAMÁ",
+    "hour_code": "NOCHE-05",
+    "sessions": [
+      {
+        "day": "SATURDAY",
+        "session_type": "Theory",
+        "classroom": "AULA 10",
+        "start_time": "09:00",
+        "end_time": "11:00"
+      }
+    ]
+  }
+]
+

@@ -1,0 +1,75 @@
+[
+  {
+    "subject_id": "5002",
+    "name": "BASE DE DATOS I",
+    "credits": 4,
+    "prerequisites": [],
+    "has_lab": true,
+    "career": "ING_SOFTWARE",
+    "term": "2026-1"
+  },
+  {
+    "subject_id": "5003",
+    "name": "BASE DE DATOS II",
+    "credits": 4,
+    "prerequisites": ["5002"],
+    "has_lab": true,
+    "career": "ING_SOFTWARE",
+    "term": "2026-1"
+  },
+  {
+    "subject_id": "0690",
+    "name": "INGENIERIA DE REQUISITOS",
+    "credits": 3,
+    "prerequisites": [],
+    "has_lab": false,
+    "career": "ING_SOFTWARE",
+    "term": "2026-1"
+  },
+  {
+    "subject_id": "0692",
+    "name": "CALIDAD DE SOFTWARE",
+    "credits": 3,
+    "prerequisites": ["0690"],
+    "has_lab": false,
+    "career": "ING_SOFTWARE",
+    "term": "2026-1"
+  },
+  {
+    "subject_id": "0687",
+    "name": "ORG. Y ARQ. DE COMPUTADORA",
+    "credits": 3,
+    "prerequisites": [],
+    "has_lab": false,
+    "career": "ING_SOFTWARE",
+    "term": "2026-1"
+  },
+  {
+    "subject_id": "0760",
+    "name": "ARQUITECTURA DE SOFTWARE",
+    "credits": 4,
+    "prerequisites": ["0692"],
+    "has_lab": false,
+    "career": "ING_SOFTWARE",
+    "term": "2026-1"
+  },
+  {
+    "subject_id": "0755",
+    "name": "REDES I",
+    "credits": 3,
+    "prerequisites": ["0687"],
+    "has_lab": false,
+    "career": "ING_SOFTWARE",
+    "term": "2026-1"
+  },
+  {
+    "subject_id": "0801",
+    "name": "TOPICOS ESPECIALES DE SOFTWARE",
+    "credits": 3,
+    "prerequisites": ["0692"],
+    "has_lab": false,
+    "career": "ING_SOFTWARE",
+    "term": "2026-1"
+  }
+]
+

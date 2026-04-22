@@ -1,0 +1,27 @@
+[
+  {
+    "career": "ING_SOFTWARE",
+    "subject_id": "5003",
+    "semester": 6,
+    "is_foundational": true
+  },
+  {
+    "career": "ING_SOFTWARE",
+    "subject_id": "0692",
+    "semester": 6,
+    "is_foundational": true
+  },
+  {
+    "career": "ING_SOFTWARE",
+    "subject_id": "0687",
+    "semester": 5,
+    "is_foundational": true
+  },
+  {
+    "career": "ING_SOFTWARE",
+    "subject_id": "0760",
+    "semester": 7,
+    "is_foundational": true
+  }
+]
+
