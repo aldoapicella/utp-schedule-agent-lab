@@ -134,6 +134,12 @@ class UTPPlanningAgent:
             )
         )
 
+        human_review = None
+        if missing_prerequisites:
+            human_review = {"reason": "Missing prerequisites"}
+        elif state.candidate_schedule is None:
+            human_review = {"reason": "No valid schedule"}
+
         memory_snapshot = {
             "desired_subjects": state.extracted_preferences["desired_subjects"],
             "required_subjects": state.extracted_preferences.get("required_subjects", []),
@@ -164,7 +170,7 @@ class UTPPlanningAgent:
             else {key: value for key, value in state.candidate_schedule.items() if key != "_raw_result"},
             "tool_calls": state.tool_calls,
             "validation_report": state.validation_report,
-            "human_review": None,
+            "human_review": human_review,
             "plan": self.planner.get_plan(),
             "memory_snapshot": memory_snapshot,
             "message_summary": json.dumps(

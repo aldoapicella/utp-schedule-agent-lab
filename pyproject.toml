@@ -33,4 +33,5 @@ testpaths = [
   "tests/stage_01_tools",
   "tests/stage_02_orchestration",
   "tests/stage_03_memory",
+  "tests/stage_04_validation",
 ]

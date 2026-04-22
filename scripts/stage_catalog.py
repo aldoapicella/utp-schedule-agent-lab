@@ -66,6 +66,16 @@ STAGES: tuple[StageDefinition, ...] = (
         tests=("tests/stage_03_memory",),
         smoke_actions=("run-agent",),
     ),
+    StageDefinition(
+        id="stage-05-validation",
+        title="Validación",
+        duration_minutes=12,
+        guiding_question="¿Cómo sabemos que el agente hizo bien su trabajo?",
+        summary="Constraints compartidas, métricas y evaluación por dataset.",
+        doc_path="docs/stages/stage-05-validation.md",
+        tests=("tests/stage_04_validation",),
+        smoke_actions=("eval",),
+    ),
 )
 
 STAGE_MAP = {stage.id: stage for stage in STAGES}

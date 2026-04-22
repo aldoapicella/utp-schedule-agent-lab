@@ -6,7 +6,7 @@ from schedule_calculator.application.scheduler import SchedulerService
 from schedule_calculator.domain.models import CourseGroup, ScheduleRequest
 from schedule_calculator.domain.rules import all_sessions_virtual
 from schedule_agent.data.catalog import CatalogStore
-from schedule_agent.tools.schemas import ValidationReport
+from schedule_agent.validation.constraints import validate_schedule_constraints
 
 
 def _parse_time(value: str):
@@ -90,55 +90,11 @@ class ScheduleTools:
         preferences: dict,
         missing_prerequisites: dict[str, list[str]],
     ) -> dict:
-        if schedule_payload is None:
-            return ValidationReport(
-                hard_constraints={
-                    "has_schedule": False,
-                    "no_conflicts": False,
-                    "within_availability": False,
-                    "province_or_virtual": False,
-                    "prerequisites_satisfied": not bool(missing_prerequisites),
-                },
-                warnings=["No valid schedule found with the current inputs."],
-                metrics={},
-            ).to_dict()
-
-        raw_result = schedule_payload["_raw_result"]
-        available_start = _parse_time(preferences.get("available_start", "08:00"))
-        available_end = _parse_time(preferences.get("available_end", "22:30"))
-        avoid_days = {day.upper() for day in preferences.get("avoid_days", [])}
-
-        within_availability = all(
-            session.start_time >= available_start and session.end_time <= available_end
-            for enrollment in raw_result.chosen_enrollments
-            for session in enrollment.sessions
-        )
-        province_or_virtual = all(
-            enrollment.province.upper() == preferences["desired_province"].upper()
-            or all_sessions_virtual(enrollment.sessions)
-            for enrollment in raw_result.chosen_enrollments
-        )
-        avoid_days_respected = all(
-            session.day.upper() not in avoid_days or session.classroom.upper() == "VVIRT"
-            for enrollment in raw_result.chosen_enrollments
-            for session in enrollment.sessions
-        )
-        report = ValidationReport(
-            hard_constraints={
-                "has_schedule": True,
-                "no_conflicts": True,
-                "within_availability": within_availability,
-                "province_or_virtual": province_or_virtual,
-                "prerequisites_satisfied": not bool(missing_prerequisites),
-                "avoid_days_respected": avoid_days_respected,
-            },
-            warnings=[],
-            metrics={
-                "subject_count": len(raw_result.chosen_enrollments),
-                "total_idle_minutes": raw_result.total_idle_minutes,
-                "total_credits": self.catalog.total_credits(
-                    [enrollment.subject_id for enrollment in raw_result.chosen_enrollments]
-                ),
-            },
+        result = schedule_payload["_raw_result"] if schedule_payload else None
+        report = validate_schedule_constraints(
+            result=result,
+            preferences=preferences,
+            catalog=self.catalog,
+            missing_prerequisites=missing_prerequisites,
         )
         return report.to_dict()

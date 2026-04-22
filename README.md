@@ -50,6 +50,7 @@ python -m scripts.tasks reset
 - `stage-02-tools`
 - `stage-03-orchestration`
 - `stage-04-memory`
+- `stage-05-validation`
 
 Material:
 
@@ -58,14 +59,15 @@ Material:
 - [docs/stages/stage-02-tools.md](/home/aldo/@utp/utp-schedule-agent-lab/docs/stages/stage-02-tools.md)
 - [docs/stages/stage-03-orchestration.md](/home/aldo/@utp/utp-schedule-agent-lab/docs/stages/stage-03-orchestration.md)
 - [docs/stages/stage-04-memory.md](/home/aldo/@utp/utp-schedule-agent-lab/docs/stages/stage-04-memory.md)
+- [docs/stages/stage-05-validation.md](/home/aldo/@utp/utp-schedule-agent-lab/docs/stages/stage-05-validation.md)
 - [scenarios/utp_semester_planning/spec.md](/home/aldo/@utp/utp-schedule-agent-lab/scenarios/utp_semester_planning/spec.md)
 
 Puedes inspeccionarlos con:
 
 ```bash
 python -m scripts.tasks list-stages
-python -m scripts.tasks stage-info stage-04-memory
-python -m scripts.tasks stage-e2e stage-04-memory
+python -m scripts.tasks stage-info stage-05-validation
+python -m scripts.tasks stage-e2e stage-05-validation
 ```
 
 ## Compatibilidad

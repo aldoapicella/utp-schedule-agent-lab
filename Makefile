@@ -16,6 +16,9 @@ run-core:
 run-agent:
 	$(TASKS) run-agent
 
+eval:
+	$(TASKS) eval
+
 seed:
 	$(TASKS) seed
 

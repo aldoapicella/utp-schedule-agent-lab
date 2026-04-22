@@ -19,6 +19,7 @@ TEST_PATHS = [
     "tests/stage_01_tools",
     "tests/stage_02_orchestration",
     "tests/stage_03_memory",
+    "tests/stage_04_validation",
 ]
 
 
@@ -37,6 +38,12 @@ def command_for(action: str) -> list[str]:
         return python_command("-m", "apps.cli", "--mode", "core")
     if action == "run-agent":
         return python_command("-m", "apps.cli", "--mode", "agent")
+    if action == "eval":
+        return python_command(
+            "scripts/run_eval.py",
+            "--dataset",
+            "src/schedule_agent/validation/datasets/eval_set.jsonl",
+        )
     if action == "seed":
         return python_command("scripts/seed_data.py")
     raise KeyError(f"Acción no soportada: {action}")
@@ -126,7 +133,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("list-stages")
     init_env_parser = subparsers.add_parser("init-env")
     init_env_parser.add_argument("--overwrite", action="store_true")
-    for action in ("setup", "test", "test-core", "run-core", "run-agent", "seed", "reset"):
+    for action in ("setup", "test", "test-core", "run-core", "run-agent", "eval", "seed", "reset"):
         subparsers.add_parser(action)
     for action in ("stage-info", "stage-test", "stage-e2e"):
         stage_parser = subparsers.add_parser(action)
