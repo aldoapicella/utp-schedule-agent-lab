@@ -1,0 +1,49 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class StageDefinition:
+    id: str
+    title: str
+    duration_minutes: int
+    guiding_question: str
+    summary: str
+    doc_path: str
+    tests: tuple[str, ...]
+    smoke_actions: tuple[str, ...]
+
+
+STAGES: tuple[StageDefinition, ...] = (
+    StageDefinition(
+        id="stage-00-core",
+        title="Core determinista",
+        duration_minutes=8,
+        guiding_question="¿Qué parte del problema debemos resolver sin IA?",
+        summary="Motor de horarios, datasets sintéticos y reglas del dominio.",
+        doc_path="docs/stages/stage-00-core.md",
+        tests=("tests/core",),
+        smoke_actions=("seed", "run-core"),
+    ),
+    StageDefinition(
+        id="stage-01-design",
+        title="Diseño",
+        duration_minutes=10,
+        guiding_question="¿Este problema realmente necesita un agente?",
+        summary="Goal, non-goals, constraints, risks y criterios de éxito.",
+        doc_path="docs/stages/stage-01-design.md",
+        tests=("tests/stage_01_design",),
+        smoke_actions=("seed",),
+    ),
+)
+
+STAGE_MAP = {stage.id: stage for stage in STAGES}
+
+
+def get_stage(stage_id: str) -> StageDefinition:
+    try:
+        return STAGE_MAP[stage_id]
+    except KeyError as exc:
+        available = ", ".join(stage.id for stage in STAGES)
+        raise KeyError(f"Stage desconocido '{stage_id}'. Disponibles: {available}") from exc

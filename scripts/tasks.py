@@ -7,11 +7,16 @@ import sys
 from pathlib import Path
 from typing import Sequence
 
+from scripts.stage_catalog import STAGES, get_stage
+
 
 ROOT = Path(__file__).resolve().parents[1]
 ARTIFACTS_DIR = ROOT / "artifacts"
 ENV_FILE = ROOT / ".env"
-TEST_PATHS = ["tests/core"]
+TEST_PATHS = [
+    "tests/core",
+    "tests/stage_01_design",
+]
 
 
 def python_command(*args: str) -> list[str]:
@@ -71,20 +76,56 @@ def print_doctor_report() -> None:
     print(f"Artifacts: {ARTIFACTS_DIR}")
 
 
+def print_stage_list() -> None:
+    print("Stages del laboratorio")
+    print("----------------------")
+    for stage in STAGES:
+        print(f"{stage.id}: {stage.title} ({stage.duration_minutes} min)")
+
+
+def print_stage_info(stage_id: str) -> None:
+    stage = get_stage(stage_id)
+    print(f"{stage.id} - {stage.title}")
+    print("-" * (len(stage.id) + len(stage.title) + 3))
+    print(f"Pregunta guía: {stage.guiding_question}")
+    print(f"Resumen: {stage.summary}")
+    print(f"Doc: {ROOT / stage.doc_path}")
+    print(f"Smoke commands: {', '.join(stage.smoke_actions)}")
+    print(f"Test paths: {', '.join(stage.tests)}")
+
+
 def run(command: Sequence[str]) -> int:
     print(f"+ {' '.join(command)}")
     completed = subprocess.run(command, cwd=ROOT, check=False)
     return completed.returncode
 
 
+def run_stage_tests(stage_id: str) -> int:
+    stage = get_stage(stage_id)
+    return run(python_command("-m", "pytest", "-q", "-s", *stage.tests))
+
+
+def run_stage_e2e(stage_id: str) -> int:
+    stage = get_stage(stage_id)
+    for action in stage.smoke_actions:
+        result = run(command_for(action))
+        if result != 0:
+            return result
+    return run_stage_tests(stage_id)
+
+
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Runner multiplataforma para stage-00-core.")
+    parser = argparse.ArgumentParser(description="Runner multiplataforma para los primeros stages.")
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("doctor")
+    subparsers.add_parser("list-stages")
     init_env_parser = subparsers.add_parser("init-env")
     init_env_parser.add_argument("--overwrite", action="store_true")
     for action in ("setup", "test", "test-core", "run-core", "seed", "reset"):
         subparsers.add_parser(action)
+    for action in ("stage-info", "stage-test", "stage-e2e"):
+        stage_parser = subparsers.add_parser(action)
+        stage_parser.add_argument("stage_id")
     return parser
 
 
@@ -94,10 +135,20 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.command == "doctor":
         print_doctor_report()
         return 0
+    if args.command == "list-stages":
+        print_stage_list()
+        return 0
     if args.command == "init-env":
         env_file = init_env_file(overwrite=args.overwrite)
         print(f"Archivo listo: {env_file}")
         return 0
+    if args.command == "stage-info":
+        print_stage_info(args.stage_id)
+        return 0
+    if args.command == "stage-test":
+        return run_stage_tests(args.stage_id)
+    if args.command == "stage-e2e":
+        return run_stage_e2e(args.stage_id)
     if args.command == "reset":
         removed = clear_lab_artifacts()
         for path in removed:

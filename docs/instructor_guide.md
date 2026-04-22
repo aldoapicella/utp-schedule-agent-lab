@@ -1,0 +1,5 @@
+# Instructor Guide
+
+- Empieza con `python -m scripts.tasks doctor`
+- Corre `python -m scripts.tasks stage-e2e stage-00-core`
+- Luego abre `stage-01-design` para discutir límites de autonomía
