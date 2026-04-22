@@ -8,7 +8,11 @@ version = "0.1.0"
 description = "Deterministic scheduling core for the UTP Schedule Agent Lab."
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+  "fastapi>=0.115,<1.0",
+  "uvicorn>=0.30,<1.0",
+  "pydantic>=2.8,<3.0",
+]
 
 [project.optional-dependencies]
 dev = [
@@ -34,4 +38,5 @@ testpaths = [
   "tests/stage_02_orchestration",
   "tests/stage_03_memory",
   "tests/stage_04_validation",
+  "tests/stage_05_monitoring",
 ]

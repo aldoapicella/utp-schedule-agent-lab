@@ -7,3 +7,4 @@
 - Cierra esta fase con `python -m scripts.tasks stage-e2e stage-03-orchestration`
 - Luego demuestra continuidad con `python -m scripts.tasks stage-e2e stage-04-memory`
 - Mide el sistema con `python -m scripts.tasks stage-e2e stage-05-validation`
+- Finalmente muestra observabilidad con `python -m scripts.tasks stage-e2e stage-06-monitoring`

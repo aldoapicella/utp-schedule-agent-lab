@@ -7,3 +7,4 @@
 5. Ejecuta `python -m scripts.tasks stage-e2e stage-03-orchestration`
 6. Ejecuta `python -m scripts.tasks stage-e2e stage-04-memory`
 7. Ejecuta `python -m scripts.tasks stage-e2e stage-05-validation`
+8. Ejecuta `python -m scripts.tasks stage-e2e stage-06-monitoring`

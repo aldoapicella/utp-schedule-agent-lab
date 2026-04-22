@@ -20,6 +20,7 @@ TEST_PATHS = [
     "tests/stage_02_orchestration",
     "tests/stage_03_memory",
     "tests/stage_04_validation",
+    "tests/stage_05_monitoring",
 ]
 
 
@@ -44,6 +45,19 @@ def command_for(action: str) -> list[str]:
             "--dataset",
             "src/schedule_agent/validation/datasets/eval_set.jsonl",
         )
+    if action == "run-api":
+        return python_command(
+            "-m",
+            "uvicorn",
+            "apps.api.main:app",
+            "--reload",
+            "--host",
+            "127.0.0.1",
+            "--port",
+            "8000",
+        )
+    if action == "trace":
+        return python_command("-m", "schedule_agent.monitoring.trace_viewer")
     if action == "seed":
         return python_command("scripts/seed_data.py")
     raise KeyError(f"Acción no soportada: {action}")
@@ -133,7 +147,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("list-stages")
     init_env_parser = subparsers.add_parser("init-env")
     init_env_parser.add_argument("--overwrite", action="store_true")
-    for action in ("setup", "test", "test-core", "run-core", "run-agent", "eval", "seed", "reset"):
+    for action in ("setup", "test", "test-core", "run-core", "run-agent", "run-api", "eval", "trace", "seed", "reset"):
         subparsers.add_parser(action)
     for action in ("stage-info", "stage-test", "stage-e2e"):
         stage_parser = subparsers.add_parser(action)

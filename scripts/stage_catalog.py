@@ -76,6 +76,16 @@ STAGES: tuple[StageDefinition, ...] = (
         tests=("tests/stage_04_validation",),
         smoke_actions=("eval",),
     ),
+    StageDefinition(
+        id="stage-06-monitoring",
+        title="Monitoring",
+        duration_minutes=8,
+        guiding_question="¿Cómo sabemos qué pasó por dentro?",
+        summary="TelemetrySession, trace files y API de observabilidad.",
+        doc_path="docs/stages/stage-06-monitoring.md",
+        tests=("tests/stage_05_monitoring",),
+        smoke_actions=("run-agent", "trace"),
+    ),
 )
 
 STAGE_MAP = {stage.id: stage for stage in STAGES}

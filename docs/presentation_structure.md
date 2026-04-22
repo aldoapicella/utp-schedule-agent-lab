@@ -8,7 +8,7 @@
 4. `stage-03-orchestration`
 5. `stage-04-memory`
 6. `stage-05-validation`
-7. monitoring
+7. `stage-06-monitoring`
 8. security
 9. human collaboration
 10. web

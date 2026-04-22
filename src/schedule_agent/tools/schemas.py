@@ -10,6 +10,7 @@ class ToolCallRecord:
     status: str
     input_summary: dict[str, Any]
     output_summary: dict[str, Any]
+    latency_ms: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

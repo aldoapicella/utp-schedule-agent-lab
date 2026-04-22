@@ -16,8 +16,14 @@ run-core:
 run-agent:
 	$(TASKS) run-agent
 
+run-api:
+	$(TASKS) run-api
+
 eval:
 	$(TASKS) eval
+
+trace:
+	$(TASKS) trace
 
 seed:
 	$(TASKS) seed
