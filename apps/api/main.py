@@ -6,7 +6,13 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from apps.api.schemas import AgentChatRequest, AgentChatResponse, SessionStateResponse
+from apps.api.schemas import (
+    AgentChatRequest,
+    AgentChatResponse,
+    HumanReviewRequest,
+    HumanReviewTicketModel,
+    SessionStateResponse,
+)
 from schedule_agent.data.catalog import default_data_dir
 from schedule_agent.orchestration.simple_agent import UTPPlanningAgent
 
@@ -56,6 +62,12 @@ def get_session_trace(session_id: str) -> list[dict]:
         for line in trace_path.read_text(encoding="utf-8").splitlines()
         if line.strip()
     ]
+
+
+@app.post("/api/v1/human-review", response_model=HumanReviewTicketModel)
+def request_human_review(request: HumanReviewRequest) -> HumanReviewTicketModel:
+    ticket = agent.human_tools.request_human_review(request.reason, request.payload)
+    return HumanReviewTicketModel.model_validate(ticket)
 
 
 @app.get("/api/v1/student-profiles")

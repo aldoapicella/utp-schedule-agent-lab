@@ -22,6 +22,7 @@ TEST_PATHS = [
     "tests/stage_04_validation",
     "tests/stage_05_monitoring",
     "tests/stage_06_security",
+    "tests/stage_07_human",
 ]
 
 

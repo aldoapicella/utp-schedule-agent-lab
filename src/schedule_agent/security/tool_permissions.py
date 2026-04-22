@@ -8,6 +8,7 @@ ALLOWED_TOOLS = {
     "check_prerequisites",
     "calculate_best_schedule",
     "validate_schedule",
+    "request_human_review",
 }
 
 

@@ -10,7 +10,7 @@
 6. `stage-05-validation`
 7. `stage-06-monitoring`
 8. `stage-07-security`
-9. human collaboration
+9. `stage-08-human-collaboration`
 10. web
 
 ## Mensaje central
@@ -23,4 +23,5 @@ flowchart LR
   B --> C["Tools tipadas"]
   C --> D["Autonomía controlada"]
   D --> E["Seguridad y límites"]
+  E --> F["Escalación humana"]
 ```

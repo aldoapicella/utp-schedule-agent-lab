@@ -27,6 +27,14 @@ class ValidationReportModel(BaseModel):
     metrics: dict[str, Any] = Field(default_factory=dict)
 
 
+class HumanReviewTicketModel(BaseModel):
+    status: str
+    reason: str
+    assigned_role: str
+    ticket_id: str | None = None
+    payload: dict[str, Any] = Field(default_factory=dict)
+
+
 class AgentChatResponse(BaseModel):
     session_id: str
     assistant_message: str
@@ -35,7 +43,7 @@ class AgentChatResponse(BaseModel):
     tool_calls: list[ToolCallRecordModel]
     memory_snapshot: dict[str, Any]
     validation_report: ValidationReportModel
-    human_review: dict[str, Any] | None = None
+    human_review: HumanReviewTicketModel | None = None
     warnings: list[str] = Field(default_factory=list)
     plan: list[str] = Field(default_factory=list)
 
@@ -43,3 +51,8 @@ class AgentChatResponse(BaseModel):
 class SessionStateResponse(BaseModel):
     session_id: str
     state: dict[str, Any] | None
+
+
+class HumanReviewRequest(BaseModel):
+    reason: str
+    payload: dict[str, Any]

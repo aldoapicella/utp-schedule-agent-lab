@@ -9,3 +9,4 @@
 7. Ejecuta `python -m scripts.tasks stage-e2e stage-05-validation`
 8. Ejecuta `python -m scripts.tasks stage-e2e stage-06-monitoring`
 9. Ejecuta `python -m scripts.tasks stage-e2e stage-07-security`
+10. Ejecuta `python -m scripts.tasks stage-e2e stage-08-human-collaboration`

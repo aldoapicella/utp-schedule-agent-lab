@@ -96,6 +96,16 @@ STAGES: tuple[StageDefinition, ...] = (
         tests=("tests/stage_06_security",),
         smoke_actions=("attack-tests",),
     ),
+    StageDefinition(
+        id="stage-08-human-collaboration",
+        title="Human collaboration",
+        duration_minutes=8,
+        guiding_question="¿Cuándo debe intervenir una persona?",
+        summary="Approval queue, política de escalación y advisor console para casos ambiguos.",
+        doc_path="docs/stages/stage-08-human-collaboration.md",
+        tests=("tests/stage_07_human",),
+        smoke_actions=("run-agent",),
+    ),
 )
 
 STAGE_MAP = {stage.id: stage for stage in STAGES}

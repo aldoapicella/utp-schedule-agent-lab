@@ -10,6 +10,8 @@ from pathlib import Path
 from schedule_calculator.adapters.in_memory_repository import InMemoryGroupCatalogRepository
 from schedule_calculator.application.scheduler import SchedulerService
 from schedule_agent.data.catalog import CatalogStore, default_data_dir
+from schedule_agent.human.approval_queue import ApprovalQueue
+from schedule_agent.human.escalation_policy import decide_escalation
 from schedule_agent.memory.preference_extractor import PreferenceExtractor
 from schedule_agent.memory.session_memory import SessionMemoryStore
 from schedule_agent.monitoring.telemetry import TelemetrySession
@@ -18,6 +20,7 @@ from schedule_agent.orchestration.state import AgentState
 from schedule_agent.security.input_guard import InputGuard
 from schedule_agent.security.tool_permissions import assert_tool_allowed
 from schedule_agent.tools.catalog_tools import CatalogTools
+from schedule_agent.tools.human_tools import HumanTools
 from schedule_agent.tools.schedule_tools import ScheduleTools
 from schedule_agent.tools.schemas import ToolCallRecord
 
@@ -40,6 +43,8 @@ class UTPPlanningAgent:
         self.planner = PlannerExecutor()
         self.preference_extractor = PreferenceExtractor(self.catalog)
         self.memory_store = SessionMemoryStore(self.database_path)
+        self.approval_queue = ApprovalQueue(self.database_path)
+        self.human_tools = HumanTools(self.approval_queue)
         self.guard = InputGuard()
 
     def _record(self, name: str, input_summary: dict, output_summary: dict, latency_ms: int) -> dict:
@@ -172,12 +177,34 @@ class UTPPlanningAgent:
             missing_prerequisites=missing_prerequisites,
         )
 
-        if guard_result.escalate:
-            state.human_review = {"reason": "Policy review required"}
-        elif missing_prerequisites:
-            state.human_review = {"reason": "Missing prerequisites"}
-        elif state.candidate_schedule is None and (requested_subjects or should_autofill_subjects):
-            state.human_review = {"reason": "No valid schedule"}
+        escalation = decide_escalation(
+            input_guard_escalate=guard_result.escalate,
+            missing_prerequisites=missing_prerequisites,
+            has_schedule=state.candidate_schedule is not None,
+            validation_failures=state.validation_report["hard_constraints"],
+        )
+        if state.warnings and not requested_subjects and not guard_result.escalate:
+            escalation = decide_escalation(
+                input_guard_escalate=False,
+                missing_prerequisites={},
+                has_schedule=True,
+                validation_failures={},
+            )
+        if escalation.required:
+            state.human_review = self._call_tool(
+                telemetry,
+                state,
+                "request_human_review",
+                self.human_tools.request_human_review,
+                reason=escalation.reason or "Manual review required",
+                payload={
+                    "student_id": student_id,
+                    "message": guard_result.sanitized_message,
+                    "preferences": state.extracted_preferences,
+                    "missing_prerequisites": missing_prerequisites,
+                },
+            )
+            telemetry.event("human_review.requested", reason=escalation.reason)
 
         memory_snapshot = {
             "desired_subjects": state.extracted_preferences["desired_subjects"],
