@@ -4,3 +4,4 @@
 - Corre `python -m scripts.tasks stage-e2e stage-00-core`
 - Luego abre `stage-01-design` para discutir límites de autonomía
 - Después corre `python -m scripts.tasks stage-e2e stage-02-tools`
+- Cierra esta fase con `python -m scripts.tasks stage-e2e stage-03-orchestration`

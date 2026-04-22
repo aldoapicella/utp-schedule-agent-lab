@@ -46,6 +46,16 @@ STAGES: tuple[StageDefinition, ...] = (
         tests=("tests/stage_01_tools",),
         smoke_actions=("run-agent",),
     ),
+    StageDefinition(
+        id="stage-03-orchestration",
+        title="Orquestación",
+        duration_minutes=12,
+        guiding_question="¿Quién decide el siguiente paso?",
+        summary="AgentState, planner-executor y flujo explícito de herramientas.",
+        doc_path="docs/stages/stage-03-orchestration.md",
+        tests=("tests/stage_02_orchestration",),
+        smoke_actions=("run-agent",),
+    ),
 )
 
 STAGE_MAP = {stage.id: stage for stage in STAGES}
