@@ -8,3 +8,4 @@
 6. Start the web UI with `python -m scripts.tasks run-web`
 7. Explore tests and complete stage TODOs on `student-start`
 8. Use `python -m scripts.tasks list-stages` to navigate the class material by stage.
+9. Use [docs/student_todos.md](/home/aldo/@utp/utp-schedule-agent-lab/docs/student_todos.md) as your checklist during the workshop.

@@ -18,6 +18,8 @@
 8. Human collaboration: `python -m scripts.tasks stage-e2e stage-08-human-collaboration`
 9. Web: `python -m scripts.tasks stage-e2e stage-09-web`
 
+If the team is using `student-start`, keep [docs/student_todos.md](/home/aldo/@utp/utp-schedule-agent-lab/docs/student_todos.md) open during the whole session.
+
 ## Close
 
 1. Review traces and human review tickets.

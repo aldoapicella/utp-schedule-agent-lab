@@ -7,6 +7,10 @@ Monorepo para un laboratorio de Agent Engineering aplicado a planificación de h
 - una API en FastAPI en `apps/api`
 - un frontend web en Next.js en `apps/web`
 
+## Branch Mode
+
+Si estás en `student-start`, usa la guía [docs/student_todos.md](/home/aldo/@utp/utp-schedule-agent-lab/docs/student_todos.md) como mapa de trabajo por stage. La rama `instructor-solution` contiene la versión completamente resuelta.
+
 ## Qué resuelve
 
 El agente recibe una solicitud de un estudiante con materias deseadas, restricciones horarias, provincia y preferencias. Luego:
@@ -109,6 +113,7 @@ Material recomendado:
 
 - [docs/presentation_structure.md](/home/aldo/@utp/utp-schedule-agent-lab/docs/presentation_structure.md)
 - [docs/stages/index.md](/home/aldo/@utp/utp-schedule-agent-lab/docs/stages/index.md)
+- [docs/student_todos.md](/home/aldo/@utp/utp-schedule-agent-lab/docs/student_todos.md)
 - [scenarios/utp_semester_planning/spec.md](/home/aldo/@utp/utp-schedule-agent-lab/scenarios/utp_semester_planning/spec.md)
 
 ## Compatibilidad
