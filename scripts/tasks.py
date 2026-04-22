@@ -16,6 +16,7 @@ ENV_FILE = ROOT / ".env"
 TEST_PATHS = [
     "tests/core",
     "tests/stage_01_design",
+    "tests/stage_01_tools",
 ]
 
 
@@ -31,7 +32,9 @@ def command_for(action: str) -> list[str]:
     if action == "test-core":
         return python_command("-m", "pytest", "tests/core", "-q")
     if action == "run-core":
-        return python_command("-m", "apps.cli")
+        return python_command("-m", "apps.cli", "--mode", "core")
+    if action == "run-agent":
+        return python_command("-m", "apps.cli", "--mode", "agent")
     if action == "seed":
         return python_command("scripts/seed_data.py")
     raise KeyError(f"Acción no soportada: {action}")
@@ -121,7 +124,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("list-stages")
     init_env_parser = subparsers.add_parser("init-env")
     init_env_parser.add_argument("--overwrite", action="store_true")
-    for action in ("setup", "test", "test-core", "run-core", "seed", "reset"):
+    for action in ("setup", "test", "test-core", "run-core", "run-agent", "seed", "reset"):
         subparsers.add_parser(action)
     for action in ("stage-info", "stage-test", "stage-e2e"):
         stage_parser = subparsers.add_parser(action)

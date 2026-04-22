@@ -47,11 +47,13 @@ python -m scripts.tasks reset
 
 - `stage-00-core`
 - `stage-01-design`
+- `stage-02-tools`
 
 Material:
 
 - [docs/stages/stage-00-core.md](/home/aldo/@utp/utp-schedule-agent-lab/docs/stages/stage-00-core.md)
 - [docs/stages/stage-01-design.md](/home/aldo/@utp/utp-schedule-agent-lab/docs/stages/stage-01-design.md)
+- [docs/stages/stage-02-tools.md](/home/aldo/@utp/utp-schedule-agent-lab/docs/stages/stage-02-tools.md)
 - [scenarios/utp_semester_planning/spec.md](/home/aldo/@utp/utp-schedule-agent-lab/scenarios/utp_semester_planning/spec.md)
 
 Puedes inspeccionarlos con:
@@ -59,7 +61,7 @@ Puedes inspeccionarlos con:
 ```bash
 python -m scripts.tasks list-stages
 python -m scripts.tasks stage-info stage-01-design
-python -m scripts.tasks stage-e2e stage-01-design
+python -m scripts.tasks stage-e2e stage-02-tools
 ```
 
 ## Compatibilidad

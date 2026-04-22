@@ -4,7 +4,7 @@
 
 1. `stage-00-core`
 2. `stage-01-design`
-3. tools
+3. `stage-02-tools`
 4. orchestration
 5. memory
 6. validation
@@ -20,5 +20,6 @@ Primero se diseña y valida el sistema; después se expande la autonomía.
 ```mermaid
 flowchart LR
   A["Core determinista"] --> B["Diseño"]
-  B --> C["Autonomía controlada"]
+  B --> C["Tools tipadas"]
+  C --> D["Autonomía controlada"]
 ```

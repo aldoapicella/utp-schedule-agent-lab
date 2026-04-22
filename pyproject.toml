@@ -30,4 +30,5 @@ pythonpath = [
 testpaths = [
   "tests/core",
   "tests/stage_01_design",
+  "tests/stage_01_tools",
 ]

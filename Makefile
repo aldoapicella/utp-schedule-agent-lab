@@ -13,6 +13,9 @@ test-core:
 run-core:
 	$(TASKS) run-core
 
+run-agent:
+	$(TASKS) run-agent
+
 seed:
 	$(TASKS) seed
 

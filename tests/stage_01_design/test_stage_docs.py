@@ -6,7 +6,9 @@ from scripts.stage_catalog import STAGES
 
 
 def test_stage_catalog_exposes_core_and_design() -> None:
-    assert [stage.id for stage in STAGES] == ["stage-00-core", "stage-01-design"]
+    stage_ids = [stage.id for stage in STAGES]
+    assert stage_ids[:2] == ["stage-00-core", "stage-01-design"]
+    assert "stage-02-tools" in stage_ids
 
 
 def test_design_docs_exist_with_required_sections() -> None:
