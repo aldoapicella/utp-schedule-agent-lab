@@ -15,7 +15,6 @@
 ## Ejecución
 
 ```bash
-python -m scripts.tasks attack-tests
 python -m scripts.tasks stage-e2e stage-07-security
 ```
 

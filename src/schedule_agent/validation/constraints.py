@@ -34,8 +34,12 @@ def validate_schedule_constraints(
         )
 
     avoid_days = set(preferences.get("avoid_days", []))
-    no_avoid_day_violation = not any(session.day.upper() in avoid_days for session in result.final_schedule)
-    total_credits = catalog.total_credits([enrollment.subject_id for enrollment in result.chosen_enrollments])
+    no_avoid_day_violation = not any(
+        session.day.upper() in avoid_days for session in result.final_schedule
+    )
+    total_credits = catalog.total_credits(
+        [enrollment.subject_id for enrollment in result.chosen_enrollments]
+    )
     within_max_credits = max_credits is None or total_credits <= max_credits
     warnings: list[str] = []
     if not no_avoid_day_violation:

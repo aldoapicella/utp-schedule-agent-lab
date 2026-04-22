@@ -37,7 +37,7 @@ class ScheduleTools:
         self.scheduler = scheduler
 
     def calculate_best_schedule(self, payload: dict) -> dict | None:
-        avoid_days = {day.upper() for day in payload.get("avoid_days", [])}
+        avoid_days = set(payload.get("avoid_days", []))
         scheduler = self.scheduler
         if avoid_days:
             scheduler = SchedulerService(_FilteredRepository(self.scheduler.repository, avoid_days))
@@ -51,7 +51,6 @@ class ScheduleTools:
         result = scheduler.find_best_schedule(request)
         if result is None:
             return None
-
         subject_names = {
             enrollment.subject_id: enrollment.subject_name or enrollment.subject_id
             for enrollment in result.chosen_enrollments

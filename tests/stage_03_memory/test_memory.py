@@ -21,3 +21,4 @@ def test_session_memory_reuses_previous_preferences() -> None:
     assert "FRIDAY" in first["memory_snapshot"]["avoid_days"]
     assert second["memory_snapshot"]["available_start"] == "17:00"
     assert "FRIDAY" in second["memory_snapshot"]["avoid_days"]
+

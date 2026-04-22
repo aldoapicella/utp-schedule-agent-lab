@@ -77,3 +77,4 @@ class ApprovalQueue:
             )
             for row in rows
         ]
+

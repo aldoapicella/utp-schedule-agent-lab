@@ -11,3 +11,4 @@ def test_evaluation_harness_returns_summary_metrics() -> None:
     assert summary["cases"] == 3
     assert 0 <= summary["hard_constraint_pass_rate"] <= 1
     assert 0 <= summary["human_review_precision"] <= 1
+

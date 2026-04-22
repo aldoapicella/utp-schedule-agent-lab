@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from apps.api.schemas import (
@@ -74,3 +74,4 @@ def request_human_review(request: HumanReviewRequest) -> HumanReviewTicketModel:
 def list_student_profiles() -> list[dict]:
     payload = json.loads((Path(default_data_dir()) / "student_profiles.json").read_text(encoding="utf-8"))
     return payload
+

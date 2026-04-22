@@ -6,12 +6,11 @@
 
 ## Conceptos a explicar
 
-- goal
-- non-goals
-- hard constraints
-- soft preferences
-- risks
-- success criteria
+- goal y non-goals
+- hard constraints y soft preferences
+- riesgos de autonomía
+- criterios de éxito observables
+- alineación con el libro: diseñar el sistema antes del prompting
 
 ## Ejecución
 
@@ -22,13 +21,15 @@ python -m scripts.tasks stage-test stage-01-design
 
 ## Actividad
 
-Leer el escenario y completar una restricción faltante.
+Leer [scenario_spec.md](/home/aldo/@utp/utp-schedule-agent-lab/src/schedule_agent/design/scenario_spec.md), detectar una restricción faltante y acordar si pertenece a hard constraint, preferencia o non-goal.
 
 ## Señal de éxito
 
 - existen `scenario_spec.md`, `constraints.md` y `architecture.md`
-- el grupo puede explicar por qué el sistema no debe matricular
-- `tests/stage_01_design` pasan
+- todos tienen material suficiente para guiar el stage
+- la clase puede explicar por qué el agente no debe matricular
+
+## Diagrama
 
 ```mermaid
 flowchart TD

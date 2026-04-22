@@ -21,3 +21,4 @@ class TelemetrySession:
                 **payload,
             }
         )
+

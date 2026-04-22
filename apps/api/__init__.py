@@ -1,1 +1,2 @@
-"""FastAPI app for the lab."""
+"""FastAPI app for the UTP schedule agent lab."""
+

@@ -42,9 +42,8 @@ class CatalogTools:
         profile = self.catalog.get_profile(student_id)
         if profile is None:
             return {subject_id: ["UNKNOWN_STUDENT"] for subject_id in subject_ids}
-
-        approved = set(profile.approved_subjects)
         missing: dict[str, list[str]] = {}
+        approved = set(profile.approved_subjects)
         for subject_id in subject_ids:
             subject = self.catalog.get_subject(subject_id)
             if subject is None:
@@ -54,3 +53,4 @@ class CatalogTools:
             if missing_prereqs:
                 missing[subject_id] = missing_prereqs
         return missing
+

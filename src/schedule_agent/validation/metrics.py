@@ -18,3 +18,4 @@ def summarize_metrics(results: list[dict]) -> dict[str, float]:
         "average_tool_calls": average_tool_calls,
         "average_latency_ms": average_latency_ms,
     }
+

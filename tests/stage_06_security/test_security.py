@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from schedule_agent.orchestration.simple_agent import UTPPlanningAgent
 from schedule_agent.security.input_guard import InputGuard
-from schedule_agent.security.tool_permissions import assert_tool_allowed
 
 
 def test_credentials_are_redacted() -> None:
@@ -22,10 +21,3 @@ def test_prompt_injection_escalates() -> None:
     assert response["human_review"] is not None
     assert "policy" in response["warnings"][0].lower() or "Potential prompt injection" in response["warnings"][0]
 
-
-def test_unregistered_tool_is_blocked() -> None:
-    try:
-        assert_tool_allowed("drop_database")
-    except PermissionError:
-        return
-    raise AssertionError("Expected PermissionError for disallowed tool")

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import json
-from datetime import datetime
 from pathlib import Path
 
 from schedule_calculator.adapters.in_memory_repository import InMemoryGroupCatalogRepository
@@ -31,8 +30,8 @@ def _run_core(sample_path: str) -> int:
     request = ScheduleRequest(
         desired_subjects=["5003", "0692", "0687"],
         required_subjects=["5003"],
-        available_start=datetime.strptime("17:00", "%H:%M").time(),
-        available_end=datetime.strptime("22:30", "%H:%M").time(),
+        available_start=__import__("datetime").datetime.strptime("17:00", "%H:%M").time(),
+        available_end=__import__("datetime").datetime.strptime("22:30", "%H:%M").time(),
         desired_province="PANAMÁ",
     )
     result = scheduler.find_best_schedule(request)
@@ -63,3 +62,4 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

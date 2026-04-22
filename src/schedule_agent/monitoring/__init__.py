@@ -1,1 +1,2 @@
-"""Monitoring helpers for traces and structured logs."""
+"""Monitoring and trace helpers."""
+

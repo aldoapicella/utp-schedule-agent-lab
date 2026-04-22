@@ -1,1 +1,2 @@
-"""Security helpers for Stage 07."""
+"""Security checks for agent input and tool use."""
+

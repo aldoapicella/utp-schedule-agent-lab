@@ -6,6 +6,7 @@ from typing import Any
 
 @dataclass(slots=True)
 class AgentState:
+    session_id: str
     student_id: str
     user_message: str
     extracted_preferences: dict[str, Any] = field(default_factory=dict)
@@ -13,5 +14,6 @@ class AgentState:
     tool_calls: list[dict[str, Any]] = field(default_factory=list)
     candidate_schedule: dict[str, Any] | None = None
     validation_report: dict[str, Any] | None = None
-    warnings: list[str] = field(default_factory=list)
     human_review: dict[str, Any] | None = None
+    warnings: list[str] = field(default_factory=list)
+

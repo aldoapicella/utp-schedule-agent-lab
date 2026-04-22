@@ -55,3 +55,4 @@ class SessionMemoryStore:
                 (session_id, student_id, payload),
             )
             connection.commit()
+

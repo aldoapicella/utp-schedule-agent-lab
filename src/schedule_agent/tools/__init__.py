@@ -1,1 +1,2 @@
-"""Typed tools for the early agent stages."""
+"""Typed tools exposed to the orchestration layer."""
+

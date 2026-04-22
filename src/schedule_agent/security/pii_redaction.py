@@ -15,3 +15,4 @@ def redact_sensitive_text(text: str) -> str:
     for pattern in SECRET_PATTERNS:
         redacted = pattern.sub(r"\1[REDACTED]", redacted)
     return redacted
+

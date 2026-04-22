@@ -3,8 +3,10 @@ __pycache__/
 .pytest_cache/
 .next/
 node_modules/
-*.egg-info/
-artifacts/
+artifacts/*.db
+artifacts/logs/
+artifacts/traces/*.jsonl
+artifacts/traces/*.tmp
 dist/
 build/
 .env

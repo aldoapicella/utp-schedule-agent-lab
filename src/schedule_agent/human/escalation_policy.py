@@ -24,3 +24,4 @@ def decide_escalation(
     if failing or not has_schedule:
         return EscalationDecision(True, "No valid schedule satisfies the academic constraints")
     return EscalationDecision(False)
+

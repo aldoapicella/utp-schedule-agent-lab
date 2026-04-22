@@ -1,1 +1,2 @@
-"""Security stage tests."""
+# Stage 06 test package.
+

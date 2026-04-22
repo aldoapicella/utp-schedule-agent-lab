@@ -46,8 +46,14 @@ class CatalogStore:
         self.data_dir = Path(data_dir or default_data_dir())
         self.subjects = self._load_subjects()
         self.subjects_by_id = {subject.subject_id: subject for subject in self.subjects}
+        self.subject_name_index = {
+            normalize_text(subject.name): subject.subject_id for subject in self.subjects
+        }
         self.profiles = self._load_profiles()
         self.profiles_by_id = {profile.student_id: profile for profile in self.profiles}
+        self.degree_plan = json.loads(
+            (self.data_dir / "degree_plan_excerpt.json").read_text(encoding="utf-8")
+        )
 
     def _load_subjects(self) -> list[Subject]:
         payload = json.loads((self.data_dir / "course_catalog.json").read_text(encoding="utf-8"))
@@ -61,7 +67,11 @@ class CatalogStore:
         return self.profiles_by_id.get(student_id)
 
     def list_subjects(self, career_code: str, term: str) -> list[Subject]:
-        return [subject for subject in self.subjects if subject.career == career_code and subject.term == term]
+        return [
+            subject
+            for subject in self.subjects
+            if subject.career == career_code and subject.term == term
+        ]
 
     def get_subject(self, subject_id: str) -> Subject | None:
         return self.subjects_by_id.get(subject_id)
@@ -86,8 +96,4 @@ class CatalogStore:
         return matched
 
     def total_credits(self, subject_ids: list[str]) -> int:
-        return sum(
-            self.subjects_by_id[subject_id].credits
-            for subject_id in subject_ids
-            if subject_id in self.subjects_by_id
-        )
+        return sum(self.subjects_by_id[subject_id].credits for subject_id in subject_ids if subject_id in self.subjects_by_id)

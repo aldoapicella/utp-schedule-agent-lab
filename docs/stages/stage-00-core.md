@@ -6,32 +6,32 @@
 
 ## Conceptos a explicar
 
-- reglas de negocio
-- datos sintéticos
-- choques de horario
-- provincia, virtualidad y laboratorios
+- reglas de negocio vs interpretación en lenguaje natural
+- datasets sintéticos y reproducibilidad
+- choques de horario, provincia, virtualidad, teoría y laboratorio
+- por qué el scheduler debe ser confiable antes de añadir un agente
 
 ## Ejecución
 
 ```bash
-python -m scripts.tasks seed
-python -m scripts.tasks run-core
-python -m scripts.tasks test
+python -m scripts.tasks stage-e2e stage-00-core
 ```
 
 ## Actividad
 
-Ejecutar el core y nombrar las reglas que nunca deberían depender del modelo.
+Ejecutar el core, leer la salida del horario y discutir qué reglas nunca deberían dejarse al LLM.
 
 ## Señal de éxito
 
-- el CLI devuelve una recomendación
+- el CLI genera una recomendación válida
 - `tests/core` pasan
-- el grupo diferencia lógica determinista de interpretación
+- el grupo puede nombrar al menos tres hard constraints del dominio
+
+## Diagrama
 
 ```mermaid
 flowchart LR
   A["Solicitud estructurada"] --> B["SchedulerService"]
-  B --> C["Reglas del dominio"]
+  B --> C["Reglas de dominio"]
   C --> D["Horario válido"]
 ```

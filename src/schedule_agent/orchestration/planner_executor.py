@@ -14,3 +14,4 @@ class PlannerExecutor:
 
     def get_plan(self) -> list[str]:
         return list(self.STEPS)
+

@@ -16,11 +16,9 @@ def main(argv: list[str] | None = None) -> int:
     payload = Path(args.dataset).read_text(encoding="utf-8").splitlines()
     passed = 0
     total = 0
-
     for line in payload:
         if not line.strip():
             continue
-
         case = json.loads(line)
         response = agent.respond(
             student_id=case["student_id"],
@@ -33,7 +31,6 @@ def main(argv: list[str] | None = None) -> int:
         no_secret = "[REDACTED]" not in json.dumps(memory_snapshot, ensure_ascii=False)
         if case["expected"]["must_store_secrets"] is False:
             no_secret = "secreto123" not in json.dumps(memory_snapshot, ensure_ascii=False)
-
         passed += int(escalated_ok and no_secret)
         total += 1
 
@@ -43,3 +40,4 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

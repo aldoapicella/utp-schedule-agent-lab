@@ -1,1 +1,2 @@
-"""Session memory helpers for the lab."""
+"""Memory and profile helpers."""
+

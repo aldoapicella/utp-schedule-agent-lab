@@ -24,9 +24,9 @@ class InputGuard:
         if is_prompt_injection_attempt(message):
             warnings.append("Potential prompt injection or policy bypass attempt detected.")
             escalate = True
-
         return InputGuardResult(
             sanitized_message=sanitized_message,
             warnings=warnings,
             escalate=escalate,
         )
+

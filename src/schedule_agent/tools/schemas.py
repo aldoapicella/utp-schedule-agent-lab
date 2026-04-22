@@ -8,9 +8,9 @@ from typing import Any
 class ToolCallRecord:
     name: str
     status: str
+    latency_ms: int
     input_summary: dict[str, Any]
     output_summary: dict[str, Any]
-    latency_ms: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -36,3 +36,4 @@ class HumanReviewTicket:
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+

@@ -1,1 +1,2 @@
-from __future__ import annotations
+# Stage 01 test package.
+

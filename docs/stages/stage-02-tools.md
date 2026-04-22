@@ -9,28 +9,32 @@
 - tools read-only
 - tools de cálculo
 - tools de validación
-- contratos tipados
+- tools de escalamiento humano
+- contratos tipados y observabilidad de llamadas
 
 ## Ejecución
 
 ```bash
-python -m scripts.tasks run-agent
 python -m scripts.tasks stage-e2e stage-02-tools
 ```
 
 ## Actividad
 
-Implementar o explicar `check_prerequisites()` y `calculate_best_schedule()`.
+Implementar o revisar `check_prerequisites()` y `calculate_best_schedule()` enfocándose en input, output y errores esperados.
 
 ## Señal de éxito
 
-- el agente usa tools explícitas
+- el agente usa tools en vez de resolver el horario “de memoria”
+- las llamadas quedan registradas en `tool_calls`
 - `tests/stage_01_tools` pasan
-- la salida muestra tool calls estructuradas
+
+## Diagrama
 
 ```mermaid
 flowchart LR
-  A["Mensaje del estudiante"] --> B["Catalog tools"]
-  B --> C["Schedule tools"]
-  C --> D["Respuesta estructurada"]
+  U["Mensaje del estudiante"] --> T["Tool registry"]
+  T --> A["check_prerequisites"]
+  T --> B["get_available_groups"]
+  T --> C["calculate_best_schedule"]
+  C --> R["Resultado estructurado"]
 ```

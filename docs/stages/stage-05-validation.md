@@ -9,29 +9,31 @@
 - hard constraints
 - soft constraints
 - eval set
-- metrics
+- métricas
 - regression testing
 
 ## Ejecución
 
 ```bash
-python -m scripts.tasks eval
 python -m scripts.tasks stage-e2e stage-05-validation
 ```
 
 ## Actividad
 
-Ejecutar la evaluación y discutir qué métrica faltaría antes de producción.
+Ejecutar la evaluación y decidir si el sistema está listo para un demo, para un piloto o solo para laboratorio.
 
 ## Señal de éxito
 
-- existe un summary cuantitativo
+- el equipo entiende cada métrica del summary
+- se detecta al menos un riesgo residual
 - `tests/stage_04_validation` pasan
-- el grupo puede explicar cada métrica
+
+## Diagrama
 
 ```mermaid
 flowchart LR
   A["Eval dataset"] --> B["Agent runs"]
   B --> C["Constraint checks"]
-  C --> D["Metrics summary"]
+  C --> D["Metrics"]
+  D --> E["Regression signal"]
 ```

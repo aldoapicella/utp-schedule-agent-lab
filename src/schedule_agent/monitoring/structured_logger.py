@@ -13,3 +13,4 @@ class StructuredLogger:
     def write(self, payload: dict[str, Any]) -> None:
         with self.output_path.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(payload, ensure_ascii=False) + "\n")
+

@@ -1,1 +1,2 @@
-"""Simple orchestration for early tool demos."""
+"""Orchestration primitives for the fixed happy path agent."""
+

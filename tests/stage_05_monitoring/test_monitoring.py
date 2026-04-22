@@ -38,3 +38,4 @@ def test_api_exposes_trace_and_agent_response() -> None:
     trace_response = client.get(f"/api/v1/sessions/{payload['session_id']}/trace")
     assert trace_response.status_code == 200
     assert isinstance(trace_response.json(), list)
+

@@ -1,1 +1,2 @@
-"""Synthetic catalog helpers for the lab."""
+"""Data access helpers for the UTP schedule lab."""
+

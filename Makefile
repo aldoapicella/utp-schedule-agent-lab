@@ -19,6 +19,15 @@ run-agent:
 run-api:
 	$(TASKS) run-api
 
+install-web:
+	$(TASKS) install-web
+
+run-web:
+	$(TASKS) run-web
+
+run-ui:
+	$(TASKS) run-ui
+
 eval:
 	$(TASKS) eval
 

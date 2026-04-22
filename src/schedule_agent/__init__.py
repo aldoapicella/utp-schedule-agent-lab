@@ -1,1 +1,2 @@
-"""Namespace for later agent stages."""
+"""Agent layer for the UTP schedule lab."""
+

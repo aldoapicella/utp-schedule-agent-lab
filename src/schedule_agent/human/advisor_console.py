@@ -9,3 +9,4 @@ class AdvisorConsole:
 
     def summarize_open_tickets(self) -> list[dict]:
         return [ticket.to_dict() for ticket in self.queue.list_open()]
+

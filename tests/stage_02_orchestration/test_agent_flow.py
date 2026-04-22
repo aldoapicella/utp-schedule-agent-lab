@@ -3,7 +3,7 @@ from __future__ import annotations
 from schedule_agent.orchestration.simple_agent import UTPPlanningAgent
 
 
-def test_agent_returns_plan_and_structured_schedule() -> None:
+def test_agent_returns_structured_schedule_and_tool_calls() -> None:
     agent = UTPPlanningAgent()
     response = agent.respond(
         student_id="student_software_01",
@@ -12,29 +12,19 @@ def test_agent_returns_plan_and_structured_schedule() -> None:
     )
 
     assert response["recommended_schedule"] is not None
-    assert response["plan"] == [
-        "extract_preferences",
-        "get_student_profile",
-        "check_prerequisites",
-        "get_available_groups",
-        "calculate_best_schedule",
-        "validate_schedule",
-        "respond",
-    ]
+    assert response["human_review"] is None
+    assert response["tool_calls"]
+    assert response["validation_report"]["hard_constraints"]["prerequisites_satisfied"] is True
 
 
-def test_agent_tool_order_follows_the_plan() -> None:
+def test_agent_escalates_when_prerequisites_are_missing() -> None:
     agent = UTPPlanningAgent()
     response = agent.respond(
-        student_id="student_software_01",
+        student_id="student_software_02",
         term="2026-1",
-        message="Quiero Base de Datos II y Calidad de Software.",
+        message="Quiero Base de Datos II y Arquitectura de Software, esta ultima es obligatoria.",
     )
-    tool_names = [call["name"] for call in response["tool_calls"]]
-    assert tool_names == [
-        "get_student_profile",
-        "check_prerequisites",
-        "get_available_groups",
-        "calculate_best_schedule",
-        "validate_schedule",
-    ]
+
+    assert response["human_review"] is not None
+    assert response["human_review"]["reason"] == "Missing prerequisites"
+

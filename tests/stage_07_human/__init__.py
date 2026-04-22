@@ -1,1 +1,2 @@
-"""Human collaboration stage tests."""
+# Stage 07 test package.
+

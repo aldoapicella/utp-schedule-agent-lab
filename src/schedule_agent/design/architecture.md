@@ -2,11 +2,20 @@
 
 ```mermaid
 flowchart LR
-  A["Student request"] --> B["Future agent layer"]
-  B --> C["Typed tools"]
-  C --> D["Deterministic schedule core"]
+  A["Student Web UI"] --> B["FastAPI"]
+  B --> C["Agent orchestrator"]
+  C --> D["Typed tools"]
+  D --> E["Deterministic schedule core"]
+  C --> F["Memory"]
+  C --> G["Validation"]
+  C --> H["Monitoring"]
+  C --> I["Human review"]
 ```
+
+- `schedule_calculator` owns schedule computation and academic hard rules.
+- `schedule_agent` owns extraction, orchestration, security, explanation, observability, and escalation.
+- `apps/web` consumes only the API.
 
 ## Teaching Message
 
-The LLM should not calculate schedules directly. The deterministic core remains the source of truth.
+The LLM does not calculate the schedule. It decides how to use tools, explains results, and stops when human review is required.

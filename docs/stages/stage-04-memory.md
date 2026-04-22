@@ -8,8 +8,9 @@
 
 - session memory
 - preferencias del usuario
-- límites de persistencia
-- contexto útil entre turnos
+- perfil académico
+- límites de datos sensibles
+- memoria útil vs acumulación peligrosa
 
 ## Ejecución
 
@@ -19,17 +20,21 @@ python -m scripts.tasks stage-e2e stage-04-memory
 
 ## Actividad
 
-Probar que el agente recuerde “no puedo viernes” en el siguiente turno.
+Enviar un turno con “no puedo viernes” y luego otro con una materia obligatoria para verificar que la preferencia siga presente.
 
 ## Señal de éxito
 
-- el agente persiste preferencias útiles
+- la memoria reutiliza preferencias permitidas
+- no guarda credenciales ni instrucciones maliciosas
 - `tests/stage_03_memory` pasan
-- el `memory_snapshot` cambia entre turnos de forma controlada
+
+## Diagrama
 
 ```mermaid
-flowchart LR
-  A["Turno 1"] --> B["PreferenceExtractor"]
-  B --> C["SessionMemoryStore"]
+flowchart TD
+  A["Turno 1"] --> B["Extractor de preferencias"]
+  B --> C["Memoria de sesión"]
   C --> D["Turno 2"]
+  D --> E["Respuesta contextual"]
+  X["PII / secretos"] --> Y["Descartar"]
 ```

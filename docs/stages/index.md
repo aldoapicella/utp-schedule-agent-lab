@@ -1,5 +1,7 @@
 # Índice de Stages
 
+Cada stage del laboratorio tiene una guía corta para clase, un comando de validación y un diagrama Mermaid.
+
 - [Stage 00: Core](/home/aldo/@utp/utp-schedule-agent-lab/docs/stages/stage-00-core.md)
 - [Stage 01: Design](/home/aldo/@utp/utp-schedule-agent-lab/docs/stages/stage-01-design.md)
 - [Stage 02: Tools](/home/aldo/@utp/utp-schedule-agent-lab/docs/stages/stage-02-tools.md)
@@ -9,3 +11,4 @@
 - [Stage 06: Monitoring](/home/aldo/@utp/utp-schedule-agent-lab/docs/stages/stage-06-monitoring.md)
 - [Stage 07: Security](/home/aldo/@utp/utp-schedule-agent-lab/docs/stages/stage-07-security.md)
 - [Stage 08: Human collaboration](/home/aldo/@utp/utp-schedule-agent-lab/docs/stages/stage-08-human-collaboration.md)
+- [Stage 09: Web](/home/aldo/@utp/utp-schedule-agent-lab/docs/stages/stage-09-web.md)
