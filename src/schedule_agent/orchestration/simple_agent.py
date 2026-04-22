@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import json
+import os
+import uuid
 from pathlib import Path
 
 from schedule_calculator.adapters.in_memory_repository import InMemoryGroupCatalogRepository
 from schedule_calculator.application.scheduler import SchedulerService
-from schedule_agent.data.catalog import CatalogStore, default_data_dir, normalize_text
+from schedule_agent.data.catalog import CatalogStore, default_data_dir
+from schedule_agent.memory.preference_extractor import PreferenceExtractor
+from schedule_agent.memory.session_memory import SessionMemoryStore
 from schedule_agent.orchestration.planner_executor import PlannerExecutor
 from schedule_agent.orchestration.state import AgentState
 from schedule_agent.tools.catalog_tools import CatalogTools
@@ -13,15 +17,22 @@ from schedule_agent.tools.schedule_tools import ScheduleTools
 from schedule_agent.tools.schemas import ToolCallRecord
 
 
+def _repo_root() -> Path:
+    return Path(__file__).resolve().parents[3]
+
+
 class UTPPlanningAgent:
-    def __init__(self, data_dir: str | Path | None = None) -> None:
+    def __init__(self, data_dir: str | Path | None = None, database_path: str | Path | None = None) -> None:
         self.data_dir = Path(data_dir or default_data_dir())
+        self.database_path = Path(database_path or os.getenv("DATABASE_PATH", _repo_root() / "artifacts" / "lab.db"))
         self.catalog = CatalogStore(self.data_dir)
         self.group_repository = InMemoryGroupCatalogRepository.from_json(self.data_dir / "group_catalog.json")
         self.scheduler = SchedulerService(self.group_repository)
         self.catalog_tools = CatalogTools(self.catalog, self.group_repository)
         self.schedule_tools = ScheduleTools(self.catalog, self.scheduler)
         self.planner = PlannerExecutor()
+        self.preference_extractor = PreferenceExtractor(self.catalog)
+        self.memory_store = SessionMemoryStore(self.database_path)
 
     def _record(self, name: str, input_summary: dict, output_summary: dict) -> dict:
         return ToolCallRecord(
@@ -31,17 +42,6 @@ class UTPPlanningAgent:
             output_summary=output_summary,
         ).to_dict()
 
-    def _extract_preferences(self, message: str, default_province: str) -> dict:
-        normalized_message = normalize_text(message)
-        return {
-            "desired_subjects": self.catalog.resolve_subject_ids_from_text(message),
-            "desired_province": default_province,
-            "avoid_days": ["FRIDAY"] if "VIERNES" in normalized_message else [],
-            "available_start": "17:00" if "5 P.M" in normalized_message or "DESPUES DE LAS 5" in normalized_message else "08:00",
-            "available_end": "22:30",
-            "required_subjects": [],
-        }
-
     def respond(
         self,
         *,
@@ -49,7 +49,10 @@ class UTPPlanningAgent:
         message: str,
         term: str,
         career: str | None = None,
+        session_id: str | None = None,
     ) -> dict:
+        session_id = session_id or str(uuid.uuid4())
+        previous_state = self.memory_store.load_state(session_id) or {}
         state = AgentState(student_id=student_id, user_message=message)
         state.student_profile = self.catalog_tools.get_student_profile(student_id)
         state.tool_calls.append(
@@ -58,7 +61,16 @@ class UTPPlanningAgent:
         if state.student_profile is None:
             raise ValueError(f"Unknown student_id '{student_id}'.")
 
-        state.extracted_preferences = self._extract_preferences(message, state.student_profile["current_province"])
+        state.extracted_preferences = self.preference_extractor.extract(
+            message,
+            previous_memory=previous_state.get("memory_snapshot"),
+        )
+        state.extracted_preferences.setdefault("desired_province", state.student_profile["current_province"])
+        state.extracted_preferences.setdefault("available_start", "08:00")
+        state.extracted_preferences.setdefault("available_end", "22:30")
+        state.extracted_preferences.setdefault("required_subjects", [])
+        state.extracted_preferences.setdefault("desired_subjects", [])
+
         if not state.extracted_preferences["desired_subjects"]:
             available = self.catalog_tools.list_available_subjects(career or state.student_profile["career"], term)
             state.extracted_preferences["desired_subjects"] = [subject["subject_id"] for subject in available[:3]]
@@ -122,7 +134,26 @@ class UTPPlanningAgent:
             )
         )
 
+        memory_snapshot = {
+            "desired_subjects": state.extracted_preferences["desired_subjects"],
+            "required_subjects": state.extracted_preferences.get("required_subjects", []),
+            "avoid_days": state.extracted_preferences.get("avoid_days", []),
+            "available_start": state.extracted_preferences.get("available_start"),
+            "available_end": state.extracted_preferences.get("available_end"),
+            "desired_province": state.extracted_preferences.get("desired_province"),
+            "preferred_shift": state.extracted_preferences.get("preferred_shift"),
+        }
+        self.memory_store.save_state(
+            session_id,
+            student_id,
+            {
+                "memory_snapshot": memory_snapshot,
+                "last_validation_report": state.validation_report,
+            },
+        )
+
         return {
+            "session_id": session_id,
             "assistant_message": (
                 "Encontré un horario factible siguiendo el plan del agente."
                 if state.candidate_schedule
@@ -135,6 +166,7 @@ class UTPPlanningAgent:
             "validation_report": state.validation_report,
             "human_review": None,
             "plan": self.planner.get_plan(),
+            "memory_snapshot": memory_snapshot,
             "message_summary": json.dumps(
                 {
                     "student_id": student_id,

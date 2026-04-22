@@ -6,7 +6,7 @@
 2. `stage-01-design`
 3. `stage-02-tools`
 4. `stage-03-orchestration`
-5. memory
+5. `stage-04-memory`
 6. validation
 7. monitoring
 8. security

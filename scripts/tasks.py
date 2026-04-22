@@ -18,6 +18,7 @@ TEST_PATHS = [
     "tests/stage_01_design",
     "tests/stage_01_tools",
     "tests/stage_02_orchestration",
+    "tests/stage_03_memory",
 ]
 
 

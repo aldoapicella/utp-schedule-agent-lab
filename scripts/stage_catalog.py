@@ -56,6 +56,16 @@ STAGES: tuple[StageDefinition, ...] = (
         tests=("tests/stage_02_orchestration",),
         smoke_actions=("run-agent",),
     ),
+    StageDefinition(
+        id="stage-04-memory",
+        title="Memoria",
+        duration_minutes=8,
+        guiding_question="¿Qué debe recordar y qué no?",
+        summary="Preferencias de sesión persistidas en SQLite local.",
+        doc_path="docs/stages/stage-04-memory.md",
+        tests=("tests/stage_03_memory",),
+        smoke_actions=("run-agent",),
+    ),
 )
 
 STAGE_MAP = {stage.id: stage for stage in STAGES}
