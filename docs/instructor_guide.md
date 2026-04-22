@@ -5,4 +5,5 @@
 - Ask teams to run `python -m scripts.tasks doctor` before starting so Windows, macOS, and Linux setups are validated early.
 - Ask teams to improve tool usage, memory, or security checks and re-run `python -m scripts.tasks eval`.
 - Use [docs/presentation_structure.md](/home/aldo/@utp/utp-schedule-agent-lab/docs/presentation_structure.md) as the main narrative spine for the class.
+- Use [docs/facilitator_checklist.md](/home/aldo/@utp/utp-schedule-agent-lab/docs/facilitator_checklist.md) as the operational runbook for the day of the workshop.
 - Once the repository has an initial commit, keep two long-lived branches: `student-start` and `instructor-solution`, then cut tags per stage from the instructor branch.

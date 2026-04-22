@@ -110,6 +110,13 @@ Material recomendado:
 - [docs/presentation_structure.md](/home/aldo/@utp/utp-schedule-agent-lab/docs/presentation_structure.md)
 - [docs/stages/index.md](/home/aldo/@utp/utp-schedule-agent-lab/docs/stages/index.md)
 - [scenarios/utp_semester_planning/spec.md](/home/aldo/@utp/utp-schedule-agent-lab/scenarios/utp_semester_planning/spec.md)
+- [docs/facilitator_checklist.md](/home/aldo/@utp/utp-schedule-agent-lab/docs/facilitator_checklist.md)
+
+## Release del taller
+
+La release pública recomendada para facilitación es `v1.0.0-workshop`. Sus notas viven en:
+
+- [docs/releases/v1.0.0-workshop.md](/home/aldo/@utp/utp-schedule-agent-lab/docs/releases/v1.0.0-workshop.md)
 
 ## Compatibilidad
 
