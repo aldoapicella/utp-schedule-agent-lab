@@ -7,3 +7,4 @@
 - [Stage 04: Memory](/home/aldo/@utp/utp-schedule-agent-lab/docs/stages/stage-04-memory.md)
 - [Stage 05: Validation](/home/aldo/@utp/utp-schedule-agent-lab/docs/stages/stage-05-validation.md)
 - [Stage 06: Monitoring](/home/aldo/@utp/utp-schedule-agent-lab/docs/stages/stage-06-monitoring.md)
+- [Stage 07: Security](/home/aldo/@utp/utp-schedule-agent-lab/docs/stages/stage-07-security.md)

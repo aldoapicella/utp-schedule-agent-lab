@@ -15,6 +15,8 @@ from schedule_agent.memory.session_memory import SessionMemoryStore
 from schedule_agent.monitoring.telemetry import TelemetrySession
 from schedule_agent.orchestration.planner_executor import PlannerExecutor
 from schedule_agent.orchestration.state import AgentState
+from schedule_agent.security.input_guard import InputGuard
+from schedule_agent.security.tool_permissions import assert_tool_allowed
 from schedule_agent.tools.catalog_tools import CatalogTools
 from schedule_agent.tools.schedule_tools import ScheduleTools
 from schedule_agent.tools.schemas import ToolCallRecord
@@ -38,6 +40,7 @@ class UTPPlanningAgent:
         self.planner = PlannerExecutor()
         self.preference_extractor = PreferenceExtractor(self.catalog)
         self.memory_store = SessionMemoryStore(self.database_path)
+        self.guard = InputGuard()
 
     def _record(self, name: str, input_summary: dict, output_summary: dict, latency_ms: int) -> dict:
         return ToolCallRecord(
@@ -69,6 +72,7 @@ class UTPPlanningAgent:
         return str(value)
 
     def _call_tool(self, telemetry: TelemetrySession, state: AgentState, name: str, fn, **kwargs):
+        assert_tool_allowed(name)
         telemetry.event("tool.called", tool=name, input_summary=self._to_json_safe(kwargs))
         started = time.perf_counter()
         result = fn(**kwargs)
@@ -92,7 +96,9 @@ class UTPPlanningAgent:
         telemetry.event("agent.started", student_id=student_id, message=message)
 
         previous_state = self.memory_store.load_state(session_id) or {}
-        state = AgentState(student_id=student_id, user_message=message)
+        guard_result = self.guard.inspect(message)
+        state = AgentState(student_id=student_id, user_message=guard_result.sanitized_message)
+        state.warnings.extend(guard_result.warnings)
         state.student_profile = self._call_tool(
             telemetry,
             state,
@@ -104,7 +110,7 @@ class UTPPlanningAgent:
             raise ValueError(f"Unknown student_id '{student_id}'.")
 
         state.extracted_preferences = self.preference_extractor.extract(
-            message,
+            guard_result.sanitized_message,
             previous_memory=previous_state.get("memory_snapshot"),
         )
         state.extracted_preferences.setdefault("desired_province", state.student_profile["current_province"])
@@ -114,7 +120,11 @@ class UTPPlanningAgent:
         state.extracted_preferences.setdefault("desired_subjects", [])
         telemetry.event("preferences.extracted", preferences=state.extracted_preferences)
 
-        if not state.extracted_preferences["desired_subjects"]:
+        requested_subjects = bool(state.extracted_preferences["desired_subjects"])
+        should_autofill_subjects = not requested_subjects and not (
+            state.warnings and not guard_result.escalate
+        )
+        if should_autofill_subjects:
             available = self._call_tool(
                 telemetry,
                 state,
@@ -162,11 +172,12 @@ class UTPPlanningAgent:
             missing_prerequisites=missing_prerequisites,
         )
 
-        human_review = None
-        if missing_prerequisites:
-            human_review = {"reason": "Missing prerequisites"}
-        elif state.candidate_schedule is None:
-            human_review = {"reason": "No valid schedule"}
+        if guard_result.escalate:
+            state.human_review = {"reason": "Policy review required"}
+        elif missing_prerequisites:
+            state.human_review = {"reason": "Missing prerequisites"}
+        elif state.candidate_schedule is None and (requested_subjects or should_autofill_subjects):
+            state.human_review = {"reason": "No valid schedule"}
 
         memory_snapshot = {
             "desired_subjects": state.extracted_preferences["desired_subjects"],
@@ -183,9 +194,10 @@ class UTPPlanningAgent:
             {
                 "memory_snapshot": memory_snapshot,
                 "last_validation_report": state.validation_report,
+                "last_human_review": state.human_review,
             },
         )
-        telemetry.event("agent.completed", escalated=bool(human_review))
+        telemetry.event("agent.completed", escalated=bool(state.human_review))
 
         explanation = [
             f"Materias consideradas: {', '.join(state.extracted_preferences['desired_subjects'])}.",
@@ -203,11 +215,11 @@ class UTPPlanningAgent:
             else {key: value for key, value in state.candidate_schedule.items() if key != "_raw_result"},
             "tool_calls": state.tool_calls,
             "validation_report": state.validation_report,
-            "human_review": human_review,
+            "human_review": state.human_review,
             "plan": self.planner.get_plan(),
             "memory_snapshot": memory_snapshot,
             "explanation": explanation,
-            "warnings": [],
+            "warnings": state.warnings,
             "message_summary": json.dumps(
                 {
                     "student_id": student_id,

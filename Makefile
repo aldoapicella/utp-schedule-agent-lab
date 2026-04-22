@@ -22,6 +22,9 @@ run-api:
 eval:
 	$(TASKS) eval
 
+attack-tests:
+	$(TASKS) attack-tests
+
 trace:
 	$(TASKS) trace
 

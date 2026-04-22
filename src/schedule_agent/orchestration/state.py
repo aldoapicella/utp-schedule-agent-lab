@@ -13,3 +13,5 @@ class AgentState:
     tool_calls: list[dict[str, Any]] = field(default_factory=list)
     candidate_schedule: dict[str, Any] | None = None
     validation_report: dict[str, Any] | None = None
+    warnings: list[str] = field(default_factory=list)
+    human_review: dict[str, Any] | None = None

@@ -86,6 +86,16 @@ STAGES: tuple[StageDefinition, ...] = (
         tests=("tests/stage_05_monitoring",),
         smoke_actions=("run-agent", "trace"),
     ),
+    StageDefinition(
+        id="stage-07-security",
+        title="Security",
+        duration_minutes=10,
+        guiding_question="¿Qué pasa si el usuario intenta romper el sistema?",
+        summary="Input guard, PII redaction, prompt injection tests y permisos mínimos.",
+        doc_path="docs/stages/stage-07-security.md",
+        tests=("tests/stage_06_security",),
+        smoke_actions=("attack-tests",),
+    ),
 )
 
 STAGE_MAP = {stage.id: stage for stage in STAGES}

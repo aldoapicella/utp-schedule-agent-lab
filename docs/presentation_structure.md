@@ -9,7 +9,7 @@
 5. `stage-04-memory`
 6. `stage-05-validation`
 7. `stage-06-monitoring`
-8. security
+8. `stage-07-security`
 9. human collaboration
 10. web
 
@@ -22,4 +22,5 @@ flowchart LR
   A["Core determinista"] --> B["Diseño"]
   B --> C["Tools tipadas"]
   C --> D["Autonomía controlada"]
+  D --> E["Seguridad y límites"]
 ```
