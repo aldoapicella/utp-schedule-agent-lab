@@ -1,0 +1,94 @@
+Metadata-Version: 2.4
+Name: utp-schedule-agent-lab
+Version: 0.1.0
+Summary: Agent engineering lab for UTP schedule planning.
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi<1.0,>=0.115
+Requires-Dist: uvicorn<1.0,>=0.30
+Requires-Dist: pydantic<3.0,>=2.8
+Requires-Dist: httpx<1.0,>=0.27
+Provides-Extra: dev
+Requires-Dist: pytest<9.0,>=8.2; extra == "dev"
+Requires-Dist: pytest-cov<6.0,>=5.0; extra == "dev"
+
+# UTP Schedule Agent Lab
+
+Monorepo para un laboratorio de Agent Engineering aplicado a planificación de horarios UTP. El proyecto combina:
+
+- un core determinista de cálculo de horarios en `src/schedule_calculator`
+- una capa agentic en `src/schedule_agent`
+- una API en FastAPI en `apps/api`
+- un frontend web en Next.js en `apps/web`
+
+## Qué resuelve
+
+El agente recibe una solicitud de un estudiante con materias deseadas, restricciones horarias, provincia y preferencias. Luego:
+
+1. extrae preferencias seguras
+2. consulta perfil y catálogo sintético
+3. valida prerrequisitos
+4. calcula el mejor horario con reglas deterministas
+5. valida el resultado
+6. explica la recomendación o escala a revisión humana
+
+El laboratorio no usa scraping vivo ni credenciales reales.
+
+## Estructura
+
+```text
+apps/
+  api/         FastAPI
+  web/         Next.js
+src/
+  schedule_calculator/
+  schedule_agent/
+scenarios/
+tests/
+scripts/
+```
+
+## Setup
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+cp .env.example .env
+make seed
+make install-web
+make test
+```
+
+## Comandos principales
+
+```bash
+make run-core
+make run-agent
+make run-api
+make run-web
+make eval
+make attack-tests
+```
+
+## Frontend
+
+La web está en `apps/web` y consume únicamente la API del backend. Usa un dashboard único con cuatro paneles:
+
+- chat del estudiante
+- recomendación y explicación
+- timeline de tool calls
+- memoria, validación y revisión humana
+
+## Etapas del laboratorio
+
+- `stage-00-core`
+- `stage-01-design`
+- `stage-02-tools`
+- `stage-03-orchestration`
+- `stage-04-memory`
+- `stage-05-validation`
+- `stage-06-monitoring`
+- `stage-07-security`
+- `stage-08-human-collaboration`
+- `stage-09-web`

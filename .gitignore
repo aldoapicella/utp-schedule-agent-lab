@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.next/
+node_modules/
+artifacts/*.db
+artifacts/logs/
+artifacts/traces/*.jsonl
+artifacts/traces/*.tmp
+dist/
+build/
+.env
+.playwright-cli/
+output/

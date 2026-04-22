@@ -1,0 +1,350 @@
+:root {
+  --bg: #f4efe6;
+  --surface: rgba(255, 252, 246, 0.92);
+  --surface-strong: #fdf8ef;
+  --text: #12343b;
+  --muted: #577073;
+  --accent: #d2a64d;
+  --accent-strong: #9c6d0b;
+  --border: rgba(18, 52, 59, 0.14);
+  --good: #2f7a4c;
+  --warn: #b36a1d;
+  --danger: #9f2d2d;
+  --shadow: 0 24px 80px rgba(18, 52, 59, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background:
+    radial-gradient(circle at top right, rgba(210, 166, 77, 0.24), transparent 26%),
+    radial-gradient(circle at left center, rgba(18, 52, 59, 0.1), transparent 22%),
+    linear-gradient(180deg, #f7f2ea 0%, #efe7d8 100%);
+  color: var(--text);
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(18, 52, 59, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 52, 59, 0.03) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.28), transparent);
+}
+
+a {
+  color: inherit;
+}
+
+.page-shell {
+  padding: 32px 20px 48px;
+}
+
+.hero {
+  max-width: 1280px;
+  margin: 0 auto 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+}
+
+.hero-copy h1 {
+  margin: 0 0 8px;
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  font-size: clamp(2rem, 4vw, 4rem);
+  line-height: 0.95;
+}
+
+.hero-copy p {
+  margin: 0;
+  max-width: 720px;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.hero-badge {
+  padding: 14px 18px;
+  border-radius: 999px;
+  background: rgba(18, 52, 59, 0.86);
+  color: #f8f3e7;
+  font-weight: 700;
+  box-shadow: var(--shadow);
+}
+
+.dashboard {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(320px, 1.02fr) minmax(320px, 1fr);
+  gap: 18px;
+}
+
+.panel {
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--surface);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.panel-header h2 {
+  margin: 0;
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  font-size: 1.05rem;
+}
+
+.panel-body {
+  padding: 20px;
+}
+
+.stack {
+  display: grid;
+  gap: 18px;
+}
+
+.chat-form {
+  display: grid;
+  gap: 14px;
+}
+
+.control-row {
+  display: grid;
+  gap: 10px;
+}
+
+.control-row.inline {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid rgba(18, 52, 59, 0.18);
+  border-radius: 16px;
+  padding: 14px 16px;
+  font: inherit;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+textarea {
+  min-height: 160px;
+  resize: vertical;
+}
+
+button {
+  border: 0;
+  border-radius: 999px;
+  padding: 13px 18px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 140ms ease, opacity 140ms ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+.primary-button {
+  background: linear-gradient(135deg, var(--accent) 0%, #f4c86f 100%);
+  color: #2d230d;
+}
+
+.secondary-button {
+  background: rgba(18, 52, 59, 0.08);
+  color: var(--text);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(18, 52, 59, 0.08);
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.course-list,
+.tool-list,
+.memory-list,
+.warning-list,
+.explanation-list,
+.trace-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.schedule-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.schedule-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.schedule-export-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.schedule-export-shell {
+  display: grid;
+  gap: 18px;
+  padding: 18px;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top right, rgba(210, 166, 77, 0.16), transparent 24%),
+    linear-gradient(180deg, rgba(255, 251, 244, 0.96), rgba(248, 242, 230, 0.96));
+  border: 1px solid rgba(18, 52, 59, 0.1);
+}
+
+.schedule-export-header h3 {
+  margin: 0 0 6px;
+}
+
+.schedule-export-header p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.weekly-schedule {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.day-column {
+  border: 1px solid rgba(18, 52, 59, 0.1);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.54);
+  overflow: hidden;
+}
+
+.day-column-header {
+  padding: 12px 14px;
+  background: rgba(18, 52, 59, 0.88);
+  color: #f8f3e7;
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  font-weight: 700;
+}
+
+.day-column-body {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+}
+
+.schedule-block {
+  padding: 12px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(210, 166, 77, 0.16), rgba(255, 255, 255, 0.92));
+  border: 1px solid rgba(210, 166, 77, 0.38);
+}
+
+.schedule-time {
+  margin-bottom: 8px;
+  font-weight: 700;
+  color: var(--accent-strong);
+}
+
+.course-card,
+.tool-card,
+.trace-card {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: var(--surface-strong);
+  border: 1px solid rgba(18, 52, 59, 0.1);
+}
+
+.course-card strong,
+.tool-card strong,
+.trace-card strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.key-value {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.key-value div {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(18, 52, 59, 0.05);
+}
+
+.metric-good {
+  color: var(--good);
+}
+
+.metric-warn {
+  color: var(--warn);
+}
+
+.metric-danger {
+  color: var(--danger);
+}
+
+.empty {
+  color: var(--muted);
+}
+
+@media (max-width: 960px) {
+  .hero {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .control-row.inline,
+  .key-value {
+    grid-template-columns: 1fr;
+  }
+}

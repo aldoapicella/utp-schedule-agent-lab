@@ -1,0 +1,19 @@
+[
+  {
+    "student_id": "student_software_01",
+    "name": "Andrea Batista",
+    "career": "ING_SOFTWARE",
+    "approved_subjects": ["5002", "0690", "0687", "0849"],
+    "current_province": "PANAMÁ",
+    "max_credits": 18
+  },
+  {
+    "student_id": "student_software_02",
+    "name": "Luis Morales",
+    "career": "ING_SOFTWARE",
+    "approved_subjects": ["5002", "0687"],
+    "current_province": "PANAMÁ OESTE",
+    "max_credits": 16
+  }
+]
+

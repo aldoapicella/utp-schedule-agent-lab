@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "utp-schedule-agent-lab"
+version = "0.1.0"
+description = "Agent engineering lab for UTP schedule planning."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "fastapi>=0.115,<1.0",
+  "uvicorn>=0.30,<1.0",
+  "pydantic>=2.8,<3.0",
+  "httpx>=0.27,<1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2,<9.0",
+  "pytest-cov>=5.0,<6.0",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "src",
+  ".",
+]
+testpaths = [
+  "tests/core",
+  "tests/stage_01_design",
+  "tests/stage_01_tools",
+  "tests/stage_02_orchestration",
+  "tests/stage_03_memory",
+  "tests/stage_04_validation",
+  "tests/stage_05_monitoring",
+  "tests/stage_06_security",
+  "tests/stage_07_human",
+  "tests/web",
+]

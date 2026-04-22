@@ -1,0 +1,7 @@
+{
+  "must_include": ["5003", "0692"],
+  "must_not_have_conflicts": true,
+  "must_respect_no_friday": true,
+  "human_review_required": false
+}
+

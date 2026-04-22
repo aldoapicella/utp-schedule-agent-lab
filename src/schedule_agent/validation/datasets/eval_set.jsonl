@@ -1,0 +1,4 @@
+{"id":"case_001","student_id":"student_software_01","term":"2026-1","request":"Quiero tomar Base de Datos II y Calidad de Software. No puedo viernes y solo puedo despues de las 5 p.m.","expected":{"must_include":["5003","0692"],"human_review_required":false}}
+{"id":"case_002","student_id":"student_software_01","term":"2026-1","request":"Necesito Base de Datos II, Calidad de Software y Org. y Arq. de Computadora en Panama.","expected":{"must_include":["5003","0692"],"human_review_required":false}}
+{"id":"case_003","student_id":"student_software_02","term":"2026-1","request":"Quiero Base de Datos II y Arquitectura de Software, es obligatoria.","expected":{"must_include":[],"human_review_required":true}}
+
