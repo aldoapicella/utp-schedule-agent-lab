@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import platform
 import shutil
 import subprocess
@@ -28,10 +29,23 @@ TEST_PATHS = [
 ]
 
 
+def _latest_nvm_binary(binary_name: str) -> str | None:
+    nvm_root = Path.home() / ".nvm" / "versions" / "node"
+    if not nvm_root.exists():
+        return None
+    candidates = sorted(nvm_root.glob(f"*/bin/{binary_name}"))
+    if not candidates:
+        return None
+    return str(candidates[-1])
+
+
 def resolve_npm_executable() -> str:
     for candidate in ("npm", "npm.cmd"):
         if shutil.which(candidate):
             return candidate
+    nvm_candidate = _latest_nvm_binary("npm")
+    if nvm_candidate:
+        return nvm_candidate
     raise SystemExit(
         "No se encontró npm en el PATH. Instala Node.js 20+ y vuelve a intentar."
     )
@@ -41,7 +55,7 @@ def resolve_node_executable() -> str | None:
     for candidate in ("node", "node.exe"):
         if shutil.which(candidate):
             return candidate
-    return None
+    return _latest_nvm_binary("node")
 
 
 def python_command(*args: str) -> list[str]:
@@ -203,7 +217,11 @@ def print_stage_info(stage_id: str) -> None:
 def run(command: Sequence[str]) -> int:
     printable = " ".join(command)
     print(f"+ {printable}")
-    completed = subprocess.run(command, cwd=ROOT, check=False)
+    env = os.environ.copy()
+    executable = Path(command[0])
+    if executable.is_absolute() and executable.name.startswith("npm"):
+        env["PATH"] = f"{executable.parent}:{env.get('PATH', '')}"
+    completed = subprocess.run(command, cwd=ROOT, check=False, env=env)
     return completed.returncode
 
 
