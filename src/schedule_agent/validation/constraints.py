@@ -6,9 +6,28 @@ from schedule_calculator.domain.models import ScheduleResult
 from schedule_agent.data.catalog import CatalogStore
 from schedule_agent.tools.schemas import ValidationReport
 
+DAY_LABELS = {
+    "MONDAY": "lunes",
+    "TUESDAY": "martes",
+    "WEDNESDAY": "miercoles",
+    "THURSDAY": "jueves",
+    "FRIDAY": "viernes",
+    "SATURDAY": "sabado",
+    "SUNDAY": "domingo",
+}
+
 
 def _parse_time(value: str):
     return datetime.strptime(value, "%H:%M").time()
+
+
+def _format_day_list(days: set[str]) -> str:
+    labels = [DAY_LABELS.get(day, day.lower()) for day in sorted(days)]
+    if not labels:
+        return ""
+    if len(labels) == 1:
+        return labels[0]
+    return ", ".join(labels[:-1]) + f" y {labels[-1]}"
 
 
 def validate_schedule_constraints(
@@ -29,7 +48,7 @@ def validate_schedule_constraints(
                 "prerequisites_satisfied": not missing_prerequisites,
                 "within_max_credits": True,
             },
-            warnings=["No valid schedule found with the current inputs."],
+            warnings=["No encontre un horario que cumpla todas las restricciones actuales."],
             metrics={},
         )
 
@@ -43,9 +62,12 @@ def validate_schedule_constraints(
     within_max_credits = max_credits is None or total_credits <= max_credits
     warnings: list[str] = []
     if not no_avoid_day_violation:
-        warnings.append("Friday classes are not allowed by the student availability.")
+        warnings.append(
+            f"El horario seleccionado incluye clases en {_format_day_list(avoid_days)}, "
+            "que estan bloqueados por la disponibilidad del estudiante."
+        )
     if not within_max_credits:
-        warnings.append("The selected schedule exceeds the student's maximum credits.")
+        warnings.append("El horario seleccionado excede el maximo de creditos del estudiante.")
     return ValidationReport(
         hard_constraints={
             "has_schedule": True,

@@ -3,12 +3,14 @@ from __future__ import annotations
 import os
 import time
 import uuid
+from datetime import datetime
 from dataclasses import asdict, is_dataclass
 from pathlib import Path
 from typing import Any
 
 from schedule_calculator.adapters.in_memory_repository import InMemoryGroupCatalogRepository
 from schedule_calculator.application.scheduler import SchedulerService
+from schedule_calculator.domain.rules import all_sessions_virtual, schedule_within_available
 from schedule_agent.data.catalog import CatalogStore, default_data_dir
 from schedule_agent.human.approval_queue import ApprovalQueue
 from schedule_agent.human.escalation_policy import decide_escalation
@@ -26,11 +28,22 @@ from schedule_agent.tools.human_tools import HumanTools
 from schedule_agent.tools.policy_tools import PolicyTools
 from schedule_agent.tools.registry import ToolRegistry
 from schedule_agent.tools.schemas import ToolCallRecord
-from schedule_agent.tools.schedule_tools import ScheduleTools
+from schedule_agent.tools.schedule_tools import ScheduleTools, _FilteredRepository
 
 
 def _repo_root() -> Path:
     return Path(__file__).resolve().parents[3]
+
+
+DAY_LABELS = {
+    "MONDAY": "lunes",
+    "TUESDAY": "martes",
+    "WEDNESDAY": "miercoles",
+    "THURSDAY": "jueves",
+    "FRIDAY": "viernes",
+    "SATURDAY": "sabado",
+    "SUNDAY": "domingo",
+}
 
 
 class UTPPlanningAgent:
@@ -66,6 +79,191 @@ class UTPPlanningAgent:
         self.registry.register("validate_schedule", self.schedule_tools.validate_schedule)
         self.registry.register("explain_academic_policy", self.policy_tools.explain_academic_policy)
         self.registry.register("request_human_review", self.human_tools.request_human_review)
+
+    @staticmethod
+    def _parse_clock(value: str):
+        return datetime.strptime(value, "%H:%M").time()
+
+    @staticmethod
+    def _format_day_list(days: list[str] | set[str]) -> str:
+        labels = [DAY_LABELS.get(day, day.lower()) for day in sorted(set(days))]
+        if not labels:
+            return ""
+        if len(labels) == 1:
+            return labels[0]
+        return ", ".join(labels[:-1]) + f" y {labels[-1]}"
+
+    def _subject_name(self, subject_id: str) -> str:
+        subject = self.catalog.get_subject(subject_id)
+        return subject.name if subject else subject_id
+
+    def _build_schedule_payload(
+        self,
+        *,
+        subject_ids: list[str],
+        preferences: dict[str, Any],
+    ) -> dict[str, Any]:
+        return {
+            "desired_subjects": subject_ids,
+            "required_subjects": preferences.get("required_subjects", []),
+            "available_start": preferences.get("available_start", "08:00"),
+            "available_end": preferences.get("available_end", "22:30"),
+            "desired_province": preferences["desired_province"],
+            "avoid_days": preferences.get("avoid_days", []),
+        }
+
+    def _groups_matching_preferences(self, subject_id: str, province: str, repository=None) -> list[Any]:
+        source = repository or self.group_repository
+        return [
+            group
+            for group in source.list_groups_for_subject(subject_id)
+            if group.province.upper() == province.upper() or all_sessions_virtual(group.sessions)
+        ]
+
+    def _group_is_feasible_within_time(self, group: Any, preferences: dict[str, Any]) -> bool:
+        return schedule_within_available(
+            group.sessions,
+            self._parse_clock(preferences.get("available_start", "08:00")),
+            self._parse_clock(preferences.get("available_end", "22:30")),
+        )
+
+    def _build_no_schedule_suggestions(
+        self,
+        *,
+        student_profile: dict[str, Any],
+        subject_ids: list[str],
+        preferences: dict[str, Any],
+        missing_prereqs: dict[str, list[str]],
+    ) -> list[str]:
+        suggestions: list[str] = []
+
+        def append_unique(message: str) -> None:
+            if message and message not in suggestions:
+                suggestions.append(message)
+
+        province = preferences["desired_province"]
+        avoid_days = set(preferences.get("avoid_days", []))
+        payload = self._build_schedule_payload(subject_ids=subject_ids, preferences=preferences)
+
+        if avoid_days:
+            for day in sorted(avoid_days):
+                relaxed_payload = dict(payload)
+                relaxed_payload["avoid_days"] = [
+                    blocked_day for blocked_day in payload.get("avoid_days", []) if blocked_day != day
+                ]
+                relaxed_schedule = self.schedule_tools.calculate_best_schedule(relaxed_payload)
+                if relaxed_schedule:
+                    chosen_names = ", ".join(
+                        item["subject_name"] for item in relaxed_schedule["chosen_enrollments"]
+                    )
+                    append_unique(
+                        f"Si flexibilizas {self._format_day_list([day])}, aparece una alternativa para {chosen_names}."
+                    )
+                    break
+
+            filtered_repository = _FilteredRepository(self.scheduler.repository, avoid_days)
+            for subject_id in subject_ids:
+                relaxed_groups = self._groups_matching_preferences(subject_id, province)
+                strict_groups = self._groups_matching_preferences(
+                    subject_id,
+                    province,
+                    repository=filtered_repository,
+                )
+                if relaxed_groups and not strict_groups:
+                    blocked_days = {
+                        session.day.upper()
+                        for group in relaxed_groups
+                        for session in group.sessions
+                        if session.day.upper() in avoid_days and not all_sessions_virtual(group.sessions)
+                    }
+                    append_unique(
+                        f"{self._subject_name(subject_id)} solo tiene grupos compatibles en "
+                        f"{self._format_day_list(blocked_days)} con tus filtros actuales."
+                    )
+
+        if payload["available_start"] != "08:00":
+            relaxed_payload = dict(payload)
+            relaxed_payload["available_start"] = "08:00"
+            relaxed_schedule = self.schedule_tools.calculate_best_schedule(relaxed_payload)
+            if relaxed_schedule:
+                chosen_names = ", ".join(
+                    item["subject_name"] for item in relaxed_schedule["chosen_enrollments"]
+                )
+                append_unique(
+                    f"Si amplias tu disponibilidad antes de las {payload['available_start']}, "
+                    f"aparece una alternativa para {chosen_names}."
+                )
+
+        best_subset: tuple[str, dict[str, Any]] | None = None
+        for removed_subject in subject_ids:
+            remaining_subjects = [subject_id for subject_id in subject_ids if subject_id != removed_subject]
+            if len(remaining_subjects) < 2:
+                continue
+            subset_payload = self._build_schedule_payload(
+                subject_ids=remaining_subjects,
+                preferences=preferences,
+            )
+            subset_schedule = self.schedule_tools.calculate_best_schedule(subset_payload)
+            if subset_schedule is None:
+                continue
+            if best_subset is None:
+                best_subset = (removed_subject, subset_schedule)
+                continue
+            current_count = len(subset_schedule["chosen_enrollments"])
+            best_count = len(best_subset[1]["chosen_enrollments"])
+            current_idle = int(subset_schedule["total_idle_minutes"])
+            best_idle = int(best_subset[1]["total_idle_minutes"])
+            if current_count > best_count or (current_count == best_count and current_idle < best_idle):
+                best_subset = (removed_subject, subset_schedule)
+
+        approved_subjects = set(student_profile.get("approved_subjects", []))
+        for subject_id in subject_ids:
+            if subject_id in approved_subjects:
+                append_unique(
+                    f"Ya tienes aprobada {self._subject_name(subject_id)}. "
+                    "Quitarla de la solicitud puede destrabar una combinacion mas realista."
+                )
+
+        if best_subset is not None:
+            removed_subject, subset_schedule = best_subset
+            chosen_names = ", ".join(
+                item["subject_name"] for item in subset_schedule["chosen_enrollments"]
+            )
+            append_unique(
+                f"Con las restricciones actuales si puedo armar {chosen_names}. "
+                f"Prueba quitando {self._subject_name(removed_subject)}."
+            )
+
+        individually_feasible: list[str] = []
+        filtered_repository = _FilteredRepository(self.scheduler.repository, avoid_days)
+        for subject_id in subject_ids:
+            strict_groups = self._groups_matching_preferences(
+                subject_id,
+                province,
+                repository=filtered_repository,
+            )
+            if any(self._group_is_feasible_within_time(group, preferences) for group in strict_groups):
+                individually_feasible.append(self._subject_name(subject_id))
+        if individually_feasible and best_subset is None:
+            append_unique(
+                "Con tus filtros actuales solo veo opciones aisladas para "
+                + ", ".join(individually_feasible)
+                + ". Para combinar mas materias tendras que flexibilizar dia u horario."
+            )
+
+        if missing_prereqs:
+            for subject_id, prereqs in missing_prereqs.items():
+                prereq_names = ", ".join(self._subject_name(prereq_id) for prereq_id in prereqs)
+                append_unique(
+                    f"Primero necesitas aprobar {prereq_names} antes de pedir {self._subject_name(subject_id)}."
+                )
+
+        if not suggestions:
+            append_unique(
+                "Prueba quitando una materia, ampliando horario o flexibilizando uno de los dias bloqueados."
+            )
+
+        return suggestions[:4]
 
     def _call_tool(
         self,
@@ -249,6 +447,19 @@ class UTPPlanningAgent:
             missing_prerequisites=missing_prereqs,
         )
 
+        selected_subject_count = (
+            len(state.candidate_schedule["chosen_enrollments"]) if state.candidate_schedule else 0
+        )
+        needs_recovery_guidance = selected_subject_count < len(subject_ids)
+        recovery_suggestions: list[str] = []
+        if needs_recovery_guidance:
+            recovery_suggestions = self._build_no_schedule_suggestions(
+                student_profile=state.student_profile,
+                subject_ids=subject_ids,
+                preferences=state.extracted_preferences,
+                missing_prereqs=missing_prereqs,
+            )
+
         escalation = decide_escalation(
             input_guard_escalate=guard_result.escalate,
             missing_prerequisites=missing_prereqs,
@@ -275,8 +486,23 @@ class UTPPlanningAgent:
             f"Provincia preferida: {state.extracted_preferences['desired_province']}.",
             f"Disponibilidad: {state.extracted_preferences.get('available_start')} a {state.extracted_preferences.get('available_end')}.",
         ]
+        if state.extracted_preferences.get("avoid_days"):
+            explanation_lines.append(
+                "Dias bloqueados: "
+                f"{self._format_day_list(state.extracted_preferences.get('avoid_days', []))}."
+            )
         if state.validation_report["warnings"]:
             explanation_lines.extend(state.validation_report["warnings"])
+        if needs_recovery_guidance:
+            if state.candidate_schedule is None:
+                explanation_lines.append(
+                    "No encontre una combinacion que cumpla todas las restricciones al mismo tiempo."
+                )
+            else:
+                explanation_lines.append(
+                    f"Solo pude incluir {selected_subject_count} de {len(subject_ids)} materias solicitadas."
+                )
+            explanation_lines.extend(recovery_suggestions)
         if missing_prereqs:
             explanation_lines.append(f"Prerrequisitos faltantes: {missing_prereqs}.")
         if guard_result.escalate:
@@ -293,6 +519,7 @@ class UTPPlanningAgent:
                 "recommended_schedule": (
                     state.candidate_schedule["chosen_enrollments"] if state.candidate_schedule else []
                 ),
+                "requested_subject_count": len(subject_ids),
                 "explanation_lines": explanation_lines,
                 "human_review": state.human_review,
             }

@@ -18,14 +18,13 @@ def test_dashboard_resets_session_when_profile_changes() -> None:
     assert "[selectedStudent, term]" in page
 
 
-def test_dashboard_reuses_session_without_pin_previous_subjects() -> None:
+def test_dashboard_starts_fresh_request_on_submit() -> None:
     page = Path("apps/web/components/dashboard.tsx").read_text(encoding="utf-8")
-    assert "const [sessionId, setSessionId]" in page
-    assert "session_id: sessionId ?? undefined" in page
-    assert "setSessionId(result.session_id)" in page
-    assert "setSessionId(null);" in page
+    assert "session_id: sessionId ?? undefined" not in page
+    assert "setResponse(null);" in page
+    assert "setTrace([]);" in page
     assert "student_id: selectedStudent" in page
-    assert "message," in page
+    assert "message: trimmedMessage" in page
 
 
 def test_dashboard_surfaces_submitted_prompt_and_warnings() -> None:
@@ -36,6 +35,14 @@ def test_dashboard_surfaces_submitted_prompt_and_warnings() -> None:
     assert "warning-banner" in page
     assert ".warning-banner" in styles
     assert ".request-preview-card" in styles
+
+
+def test_dashboard_surfaces_partial_schedule_status() -> None:
+    page = Path("apps/web/components/dashboard.tsx").read_text(encoding="utf-8")
+    assert "Alternativa parcial" in page
+    assert "Sin combinación" in page
+    assert "Horario completo" in page
+    assert "Cobertura" in page
 
 
 def test_dashboard_uses_weekly_schedule_component() -> None:

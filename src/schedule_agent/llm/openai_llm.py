@@ -103,6 +103,7 @@ class OpenAILLM(LLMClient):
         return json.dumps(
             {
                 "recommended_schedule": context.get("recommended_schedule") or [],
+                "requested_subject_count": context.get("requested_subject_count") or 0,
                 "explanation_lines": context.get("explanation_lines") or [],
                 "human_review": context.get("human_review"),
             },

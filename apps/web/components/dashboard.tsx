@@ -20,7 +20,6 @@ export function Dashboard() {
   const [term, setTerm] = useState("2026-1");
   const [message, setMessage] = useState(DEFAULT_PROMPT);
   const [lastSubmittedMessage, setLastSubmittedMessage] = useState<string | null>(null);
-  const [sessionId, setSessionId] = useState<string | null>(null);
   const [response, setResponse] = useState<AgentChatResponse | null>(null);
   const [trace, setTrace] = useState<Array<Record<string, unknown>>>([]);
   const [loading, setLoading] = useState(false);
@@ -37,7 +36,6 @@ export function Dashboard() {
     setTrace([]);
     setError(null);
     setLastSubmittedMessage(null);
-    setSessionId(null);
   }, [selectedStudent, term]);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -54,12 +52,10 @@ export function Dashboard() {
     setLastSubmittedMessage(trimmedMessage);
     try {
       const result = await sendAgentMessage({
-        session_id: sessionId ?? undefined,
         student_id: selectedStudent,
         message: trimmedMessage,
         term,
       });
-      setSessionId(result.session_id);
       setResponse(result);
       const traceRows = await fetchTrace(result.session_id);
       setTrace(traceRows);
@@ -77,6 +73,26 @@ export function Dashboard() {
   const warningItems = response
     ? [...new Set([...response.warnings, ...response.validation_report.warnings])]
     : [];
+  const requestedSubjects = Array.isArray(response?.memory_snapshot.desired_subjects)
+    ? response.memory_snapshot.desired_subjects.length
+    : 0;
+  const includedSubjects = response?.recommended_schedule?.chosen_enrollments?.length ?? 0;
+  const hasPartialCoverage = Boolean(response) && requestedSubjects > 0 && includedSubjects < requestedSubjects;
+  const recommendationStatus = (() => {
+    if (response?.human_review) {
+      return "Escalado a humano";
+    }
+    if (!response) {
+      return "Recomendación local";
+    }
+    if (includedSubjects === 0) {
+      return "Sin combinación";
+    }
+    if (hasPartialCoverage) {
+      return "Alternativa parcial";
+    }
+    return "Horario completo";
+  })();
 
   return (
     <div className="page-shell">
@@ -209,9 +225,7 @@ export function Dashboard() {
           <article className="panel">
             <div className="panel-header">
               <h2>Recomendación del agente</h2>
-              <span className="pill">
-                {response?.human_review ? "Escalado a humano" : "Recomendación local"}
-              </span>
+              <span className="pill">{recommendationStatus}</span>
             </div>
             <div className="panel-body stack">
               {error ? <p className="metric-danger">{error}</p> : null}
@@ -225,6 +239,14 @@ export function Dashboard() {
                       </li>
                     ))}
                   </ul>
+                </div>
+              ) : null}
+              {response ? (
+                <div className="request-preview-card">
+                  <strong>Cobertura</strong>
+                  <p>
+                    Incluidas {includedSubjects} de {requestedSubjects || includedSubjects} materias solicitadas.
+                  </p>
                 </div>
               ) : null}
               {lastSubmittedMessage ? (

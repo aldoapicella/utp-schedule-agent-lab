@@ -18,6 +18,16 @@ PROVINCES = [
     "AZUERO",
 ]
 
+DAY_ALIASES = {
+    "LUNES": "MONDAY",
+    "MARTES": "TUESDAY",
+    "MIERCOLES": "WEDNESDAY",
+    "JUEVES": "THURSDAY",
+    "VIERNES": "FRIDAY",
+    "SABADO": "SATURDAY",
+    "DOMINGO": "SUNDAY",
+}
+
 
 class PreferenceExtractor:
     def __init__(self, catalog: CatalogStore) -> None:
@@ -38,13 +48,15 @@ class PreferenceExtractor:
                 preferences[key] = value
 
         normalized = normalize_text(message)
-        if (
-            "NO PUEDO VIERNES" in normalized
-            or "EVITAR VIERNES" in normalized
-            or "NO VIERNES" in normalized
-            or "SIN VIERNES" in normalized
-        ):
-            preferences["avoid_days"] = sorted(set([*preferences["avoid_days"], "FRIDAY"]))
+        for day_text, day_code in DAY_ALIASES.items():
+            if (
+                f"NO PUEDO {day_text}" in normalized
+                or f"NO PUEDO LOS {day_text}" in normalized
+                or f"EVITAR {day_text}" in normalized
+                or f"NO {day_text}" in normalized
+                or f"SIN {day_text}" in normalized
+            ):
+                preferences["avoid_days"] = sorted(set([*preferences["avoid_days"], day_code]))
         if (
             "DESPUES DE LAS 5" in normalized
             or "DESPUES DE 5" in normalized
