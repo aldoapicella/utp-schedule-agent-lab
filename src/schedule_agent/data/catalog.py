@@ -1,9 +1,25 @@
 from __future__ import annotations
 
 import json
+import re
 import unicodedata
 from dataclasses import dataclass
 from pathlib import Path
+
+SUBJECT_ALIASES: dict[str, tuple[str, ...]] = {
+    "5002": ("BD 1", "BASE DATOS 1", "BASE DE DATOS 1"),
+    "5003": ("BD 2", "BASE DATOS 2", "BASE DE DATOS 2"),
+    "0690": ("REQUISITOS", "INGENIERIA REQUISITOS"),
+    "0692": ("CALIDAD", "CALIDAD SOFTWARE"),
+    "0687": (
+        "ARQUITECTURA DE COMPUTADORA",
+        "ORGANIZACION ARQUITECTURA COMPUTADORA",
+        "ARQUITECTURA COMP",
+    ),
+    "0760": ("ARQUITECTURA SOFTWARE",),
+    "0755": ("REDES", "REDES 1", "REDES DE COMPUTADORAS"),
+    "0801": ("TOPICOS", "TOPICOS ESPECIALES", "TOPICOS ESPECIALES SOFTWARE"),
+}
 
 
 def _repo_root() -> Path:
@@ -17,7 +33,22 @@ def default_data_dir() -> Path:
 def normalize_text(value: str) -> str:
     normalized = unicodedata.normalize("NFD", value)
     without_marks = "".join(char for char in normalized if unicodedata.category(char) != "Mn")
-    return without_marks.upper()
+    uppercase = without_marks.upper()
+    without_punctuation = re.sub(r"[^A-Z0-9]+", " ", uppercase)
+    collapsed = re.sub(r"\s+", " ", without_punctuation).strip()
+
+    normalized_words = collapsed
+    for source, target in (
+        ("ORG", "ORGANIZACION"),
+        ("ARQ", "ARQUITECTURA"),
+        ("III", "3"),
+        ("II", "2"),
+        ("IV", "4"),
+        ("I", "1"),
+    ):
+        normalized_words = re.sub(rf"\b{source}\b", target, normalized_words)
+
+    return normalized_words
 
 
 @dataclass(slots=True)
@@ -93,6 +124,18 @@ class CatalogStore:
             if normalized_name in working_text and subject.subject_id not in matched:
                 matched.append(subject.subject_id)
                 working_text = working_text.replace(normalized_name, " ")
+                continue
+            aliases = sorted(
+                SUBJECT_ALIASES.get(subject.subject_id, ()),
+                key=lambda alias: len(normalize_text(alias)),
+                reverse=True,
+            )
+            for alias in aliases:
+                normalized_alias = normalize_text(alias)
+                if normalized_alias in working_text and subject.subject_id not in matched:
+                    matched.append(subject.subject_id)
+                    working_text = working_text.replace(normalized_alias, " ")
+                    break
         return matched
 
     def total_credits(self, subject_ids: list[str]) -> int:

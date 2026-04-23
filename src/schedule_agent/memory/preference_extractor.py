@@ -25,17 +25,33 @@ class PreferenceExtractor:
 
     def extract(self, message: str, previous_memory: dict[str, Any] | None = None) -> dict[str, Any]:
         previous_memory = previous_memory or {}
-        preferences = dict(previous_memory)
-        preferences.setdefault("available_start", "08:00")
-        preferences.setdefault("available_end", "22:30")
-        preferences.setdefault("avoid_days", [])
-        preferences.setdefault("required_subjects", [])
-        preferences.setdefault("desired_subjects", [])
+        preferences = {
+            "available_start": previous_memory.get("available_start", "08:00"),
+            "available_end": previous_memory.get("available_end", "22:30"),
+            "avoid_days": list(previous_memory.get("avoid_days", [])),
+            "required_subjects": [],
+            "desired_subjects": [],
+        }
+        for key in ("desired_province", "preferred_shift", "max_credits"):
+            value = previous_memory.get(key)
+            if value is not None:
+                preferences[key] = value
 
         normalized = normalize_text(message)
-        if "NO PUEDO VIERNES" in normalized or "EVITAR VIERNES" in normalized:
+        if (
+            "NO PUEDO VIERNES" in normalized
+            or "EVITAR VIERNES" in normalized
+            or "NO VIERNES" in normalized
+            or "SIN VIERNES" in normalized
+        ):
             preferences["avoid_days"] = sorted(set([*preferences["avoid_days"], "FRIDAY"]))
-        if "DESPUES DE LAS 5" in normalized or "DESPUES DE 5" in normalized:
+        if (
+            "DESPUES DE LAS 5" in normalized
+            or "DESPUES DE 5" in normalized
+            or "PREFERENCIA DE NOCHE" in normalized
+            or "PREFIERO NOCHE" in normalized
+            or "NOCTURNO" in normalized
+        ):
             preferences["available_start"] = "17:00"
             preferences["preferred_shift"] = "EVENING"
         if "TRABAJO HASTA LAS 5" in normalized or "TRABAJO DE 8 A 5" in normalized:

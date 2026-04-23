@@ -9,6 +9,7 @@ artifacts/traces/*.jsonl
 artifacts/traces/*.tmp
 dist/
 build/
+*.egg-info/
 .env
 .playwright-cli/
 output/

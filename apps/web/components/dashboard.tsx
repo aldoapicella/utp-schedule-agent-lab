@@ -19,6 +19,8 @@ export function Dashboard() {
   const [selectedStudent, setSelectedStudent] = useState<string>("student_software_01");
   const [term, setTerm] = useState("2026-1");
   const [message, setMessage] = useState(DEFAULT_PROMPT);
+  const [lastSubmittedMessage, setLastSubmittedMessage] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [response, setResponse] = useState<AgentChatResponse | null>(null);
   const [trace, setTrace] = useState<Array<Record<string, unknown>>>([]);
   const [loading, setLoading] = useState(false);
@@ -34,19 +36,30 @@ export function Dashboard() {
     setResponse(null);
     setTrace([]);
     setError(null);
-  }, [selectedStudent]);
+    setLastSubmittedMessage(null);
+    setSessionId(null);
+  }, [selectedStudent, term]);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const trimmedMessage = message.trim();
+    if (!trimmedMessage) {
+      setError("Escribe una solicitud antes de ejecutar el agente.");
+      return;
+    }
     setLoading(true);
     setError(null);
+    setResponse(null);
+    setTrace([]);
+    setLastSubmittedMessage(trimmedMessage);
     try {
       const result = await sendAgentMessage({
-        session_id: response?.session_id,
+        session_id: sessionId ?? undefined,
         student_id: selectedStudent,
-        message,
+        message: trimmedMessage,
         term,
       });
+      setSessionId(result.session_id);
       setResponse(result);
       const traceRows = await fetchTrace(result.session_id);
       setTrace(traceRows);
@@ -61,6 +74,9 @@ export function Dashboard() {
     () => profiles.find((profile) => profile.student_id === selectedStudent),
     [profiles, selectedStudent],
   );
+  const warningItems = response
+    ? [...new Set([...response.warnings, ...response.validation_report.warnings])]
+    : [];
 
   return (
     <div className="page-shell">
@@ -118,6 +134,13 @@ export function Dashboard() {
                     Cargar ejemplo
                   </button>
                 </div>
+
+                {lastSubmittedMessage ? (
+                  <div className="request-preview-card">
+                    <strong>Solicitud enviada</strong>
+                    <p>{lastSubmittedMessage}</p>
+                  </div>
+                ) : null}
               </form>
             </div>
           </article>
@@ -166,14 +189,9 @@ export function Dashboard() {
 
               <div>
                 <h3>Alertas</h3>
-                {response?.warnings.length || response?.validation_report.warnings.length ? (
+                {warningItems.length ? (
                   <ul className="warning-list">
-                    {response.warnings.map((warning) => (
-                      <li key={warning} className="metric-warn">
-                        {warning}
-                      </li>
-                    ))}
-                    {response.validation_report.warnings.map((warning) => (
+                    {warningItems.map((warning) => (
                       <li key={warning} className="metric-warn">
                         {warning}
                       </li>
@@ -197,6 +215,24 @@ export function Dashboard() {
             </div>
             <div className="panel-body stack">
               {error ? <p className="metric-danger">{error}</p> : null}
+              {warningItems.length ? (
+                <div className="warning-banner">
+                  <strong>Advertencia</strong>
+                  <ul className="warning-list">
+                    {warningItems.map((warning) => (
+                      <li key={warning} className="metric-warn">
+                        {warning}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+              {lastSubmittedMessage ? (
+                <div className="request-preview-card">
+                  <strong>Solicitud procesada</strong>
+                  <p>{lastSubmittedMessage}</p>
+                </div>
+              ) : null}
               <div>
                 <strong>{response?.assistant_message ?? "Esperando una solicitud."}</strong>
               </div>
