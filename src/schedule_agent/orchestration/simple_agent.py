@@ -160,20 +160,54 @@ class UTPPlanningAgent:
             state.student_profile.get("max_credits"),
         )
         subject_ids = state.extracted_preferences.get("desired_subjects", [])
-        if not subject_ids:
-            available_subjects = self._call_tool(
-                state,
-                telemetry,
-                "list_available_subjects",
-                career_code=career or state.student_profile["career"],
-                term=term,
+        if not subject_ids and not guard_result.escalate:
+            warning = (
+                "No pude identificar materias concretas en tu mensaje. "
+                "Usa nombres del catálogo como Base de Datos II, Calidad de Software, "
+                "Arquitectura de Software o Redes I."
             )
-            subject_ids = [
-                subject["subject_id"]
-                for subject in available_subjects
-                if self.group_repository.list_groups_for_subject(subject["subject_id"])
-            ][:3]
-            state.extracted_preferences["desired_subjects"] = subject_ids
+            state.warnings.append(warning)
+            memory_snapshot = {
+                "desired_subjects": [],
+                "required_subjects": state.extracted_preferences.get("required_subjects", []),
+                "avoid_days": state.extracted_preferences.get("avoid_days", []),
+                "available_start": state.extracted_preferences.get("available_start"),
+                "available_end": state.extracted_preferences.get("available_end"),
+                "desired_province": state.extracted_preferences.get("desired_province"),
+                "preferred_shift": state.extracted_preferences.get("preferred_shift"),
+                "max_credits": state.extracted_preferences.get("max_credits"),
+            }
+            validation_report = {
+                "hard_constraints": {"has_schedule": False},
+                "warnings": [warning],
+                "metrics": {"subject_count": 0, "requested_subjects": 0},
+            }
+            self.memory_store.save_state(
+                session_id,
+                student_id,
+                {
+                    "memory_snapshot": memory_snapshot,
+                    "student_profile": state.student_profile,
+                    "last_validation_report": validation_report,
+                    "last_human_review": None,
+                },
+            )
+            telemetry.event("agent.completed", escalated=False, reason="subjects_not_identified")
+            return {
+                "session_id": session_id,
+                "assistant_message": "No pude identificar las materias de tu solicitud.",
+                "recommended_schedule": None,
+                "explanation": [
+                    warning,
+                    "Ajusta la solicitud y vuelve a intentar con nombres del catálogo sintético.",
+                ],
+                "tool_calls": state.tool_calls,
+                "memory_snapshot": memory_snapshot,
+                "validation_report": validation_report,
+                "human_review": None,
+                "warnings": state.warnings,
+                "plan": self.planner.get_plan(),
+            }
 
         missing_prereqs = self._call_tool(
             state,

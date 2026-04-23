@@ -23,10 +23,13 @@ class MockLLM(LLMClient):
                 explanation=context.get("explanation_lines") or ["No hubo combinaciones factibles."],
             )
 
+        subject_names = [str(item.get("subject_name", "")).strip() for item in recommended]
+        subject_summary = ", ".join(name for name in subject_names if name) or "las materias solicitadas"
         lines = [
             "Recomendé la combinación con mayor cobertura válida y menor tiempo muerto.",
             *(context.get("explanation_lines") or []),
         ]
-        assistant_message = "Encontré un horario factible y ya validé las restricciones principales."
+        assistant_message = (
+            f"Encontré un horario factible para {subject_summary} y ya validé las restricciones principales."
+        )
         return GeneratedResponse(assistant_message=assistant_message, explanation=lines)
-

@@ -298,6 +298,31 @@ button:hover {
   border: 1px solid rgba(18, 52, 59, 0.1);
 }
 
+.request-preview-card,
+.warning-banner {
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(18, 52, 59, 0.1);
+  background: var(--surface-strong);
+}
+
+.request-preview-card strong,
+.warning-banner strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.request-preview-card p {
+  margin: 0;
+  color: var(--muted);
+  white-space: pre-wrap;
+}
+
+.warning-banner {
+  border-color: rgba(179, 106, 29, 0.28);
+  background: linear-gradient(180deg, rgba(210, 166, 77, 0.1), rgba(255, 251, 244, 0.96));
+}
+
 .course-card strong,
 .tool-card strong,
 .trace-card strong {
